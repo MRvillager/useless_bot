@@ -67,7 +67,7 @@ class Bank:
         return len(self._user_id_cache)
 
     def init_db(self):
-        if self._db is not None:
+        if self._db is None:
             self._db = sqlite3.connect("data/data.sqlite", isolation_level=None,
                                        detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
 

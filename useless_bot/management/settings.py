@@ -13,7 +13,7 @@ class Settings(commands.Cog, name="Settings Menu"):
         self.bot = bot
 
         self.meme = self.bot.get_cog("Meme")
-        self.roles = self.bot.get_cog("Meme")
+        self.roles = self.bot.get_cog("Roles")
         self.sauce = self.bot.get_cog("Sauce")
 
     async def cog_check(self, ctx: Context):
@@ -70,7 +70,7 @@ class Settings(commands.Cog, name="Settings Menu"):
         if args:
             await self.meme.source("+".join(list(args)))
         await ctx.reply(
-            f"Default subreddits: {' r/'.join(self.meme.config['subreddits'].split('+'))}",
+            f"Default subreddits: r/{' r/'.join(self.meme.config['subreddits'].split('+'))}",
             mention_author=False,
         )
 
@@ -94,7 +94,7 @@ class Settings(commands.Cog, name="Settings Menu"):
         if len(args) != 0:
             await self.sauce.source(args)
         await ctx.reply(
-            f"Default subreddits: {' r/'.join(self.sauce.config['subreddits'].split('+'))}",
+            f"Default subreddits: r/{' r/'.join(self.sauce.config['subreddits'].split('+'))}",
             mention_author=False,
         )
 

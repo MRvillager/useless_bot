@@ -36,8 +36,12 @@ class Config:
     @staticmethod
     def pull():
         global data
-        with open("data/config.json", 'r') as outfile:
-            data = json.load(outfile)
+        try:
+            with open("data/config.json", 'r') as outfile:
+                data = json.load(outfile)
+        except FileNotFoundError:
+            data = {}
+            Config.push()
 
     @staticmethod
     def push():

@@ -53,11 +53,11 @@ def check_user_existence(add: bool = False):
 
 
 class Bank:
-    _db = sqlite3.connect("data/data.sqlite", isolation_level=None,
-                          detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+    _db = None
     _user_id_cache: list = None
 
     def __init__(self):
+        self.init_db()
         self._cur = self._db.cursor()
 
         if not self._user_id_cache:
@@ -65,6 +65,15 @@ class Bank:
 
     def __len__(self) -> int:
         return len(self._user_id_cache)
+
+    def init_db(self):
+        if self._db is not None:
+            self._db = sqlite3.connect("data/data.sqlite", isolation_level=None,
+                                       detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+
+            with open("data/init.sql", "r") as f:
+                sql_as_string = f.read()
+            self._db.executescript(sql_as_string)
 
     @check_user_id
     @check_user_existence(add=True)

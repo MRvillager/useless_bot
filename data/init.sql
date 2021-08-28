@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS users;
-create table users
+create table if not exists users
 (
     user_id           unsigned bigint not null
         constraint users_pk
@@ -9,8 +8,7 @@ create table users
     last_free_credits unsigned int default 0 not null
 );
 
-DROP TABLE IF EXISTS transactions;
-create table transactions
+create table if not exists transactions
 (
     id         INTEGER         not null
         constraint transactions_pk
@@ -25,5 +23,5 @@ create table transactions
     Foreign Key (user_id) References users (user_id) On Delete Cascade
 );
 
-create unique index transactions_id_uindex
+create unique index if not exists transactions_id_uindex
     on transactions (id);

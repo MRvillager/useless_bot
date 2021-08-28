@@ -32,8 +32,6 @@ This is a self-hosted bot, so you will need to host and maintain your own instan
         set REDDIT_ID=yourclientid
         set REDDIT_SECRET=yourclientsecret
         ```
-6. Create the database for the bank using the script [create_db.py](scripts/create_db.py) \
-   `python scripts/create_db.py`
 7. Run the bot using \
    `python -m useless_bot`
    

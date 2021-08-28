@@ -11,4 +11,4 @@ RUN apt update && apt install -y git \
     && rm -rf /var/lib/apt/lists/*
 
 # Commands to execute inside container
-CMD ["python3 -O -B -m useless_bot"]
+CMD ["python", "-O", "-B", "-m", "useless_bot"]

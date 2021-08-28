@@ -44,10 +44,8 @@ docker run -it --rm \
     -e REDDIT_ID="yourclientid" \
     -e REDDIT_SECRET="yourclientsecret" \
     -v /path/to/data:/bot/data \
-    mrvillager/useless_bot
+    ghcr.io/mrvillager/useless_bot:main
 ```
-
-
 
 ## License
 

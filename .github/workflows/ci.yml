@@ -33,4 +33,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/armhf
           push: true
-          tags: user/app:latest
+          tags: mrvillager/useless_bot:latest

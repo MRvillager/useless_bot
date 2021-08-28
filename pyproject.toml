@@ -21,7 +21,7 @@ create_db = 'useless-bot.scripts.create_db:main'
 python = "^3.9"
 discord-pretty-help = "*"
 multidict = "^5.1"
-aiohttp = { version = "^3.7", extras = ["speedups"] }
+aiohttp = { version = "^3.7.4", extras = ["speedups"] }
 uvloop = { version = "^0.15", markers = "sys_platform == 'linux'" }
 "discord.py" = { git = "https://github.com/MRvillager/discord.py.git", extras = ["voice"] }
 

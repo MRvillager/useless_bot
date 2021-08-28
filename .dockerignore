@@ -1,0 +1,7 @@
+.github/
+.gitignore
+.deepsource.toml
+README.md
+poetry.lock
+pyproject.toml
+setup.py

@@ -36,6 +36,20 @@ This is a self-hosted bot, so you will need to host and maintain your own instan
    `python scripts/create_db.py`
 7. Run the bot using \
    `python -m useless_bot`
+   
+## Set-up with Docker
+
+```bash
+docker run -it --rm \
+    --name useless_bot \
+    -e DISCORD_TOKEN="yourtoken" \
+    -e REDDIT_ID="yourclientid" \
+    -e REDDIT_SECRET="yourclientsecret" \
+    -v /path/to/data:/bot/data \
+    mrvillager/useless_bot
+```
+
+
 
 ## License
 

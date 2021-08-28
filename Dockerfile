@@ -1,11 +1,15 @@
 FROM python:slim-buster
-WORKDIR /usr/src/bot
+WORKDIR /bot
 
-RUN apt update && apt install -y git \
-    && /usr/local/bin/python -m pip install --upgrade pip \
-    && pip install -i https://www.piwheels.org/simple/ --extra-index-url https://pypi.org/simple/ --no-cache-dir -r ~/requirements.txt \
-    && rm ~/requirements.txt \
-    && rm -rf /var/lib/apt/lists/*
+COPY . .
+
+RUN /usr/local/bin/python -m pip install --upgrade pip \
+    && pip install -i https://www.piwheels.org/simple/ --extra-index-url https://pypi.org/simple/ --no-cache-dir -r requirements.txt \
+    && python -O -B scripts/create_db.py \
+    && pip uninstall pip \
+    && rm -rf scripts/ \
+    && rm data/init.sql
+    && rm requirements.txt
 
 # Commands to execute inside container
-CMD ["scripts/run_docker.sh"]
+CMD ["python -O -B -m useless_bot"]

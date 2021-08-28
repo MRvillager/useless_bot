@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  bot:
+    build:
+      context: .
+      network: bridge
+    volumes:
+      - type: bind
+        source: ./
+        target: /usr/src/bot
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 30s
+      resources:
+        limits:
+          cpus: '0.10'
+          memory: 75M
+    logging:
+      options:
+        max-size: '4m'
+        max-file: '4'
+    env_file: secrets.env
+    healthcheck:
+      disable: true
+    stop_signal: SIGINT

@@ -26,7 +26,7 @@ class BankInterface(commands.Cog, name="Bank"):
         self.bot = bot
 
         # bank init
-        self.bank = bank
+        self._bank = bank
 
     async def cog_command_error(self, ctx: Context, error: CommandError):
         if isinstance(error, BalanceNotSufficientError):
@@ -63,10 +63,10 @@ class BankInterface(commands.Cog, name="Bank"):
 
         if hours > 0:
             return f"You need to wait {hours} hours"
-        elif minutes > 0:
+        if minutes > 0:
             return f"You need to wait {minutes} minutes"
-        else:
-            return f"You need to wait {seconds} seconds"
+
+        return f"You need to wait {seconds} seconds"
 
     @group(invoke_without_command=True, usage="")
     async def bank(self, ctx: Context, user: Optional[Union[discord.User, discord.Member]] = None):
@@ -76,7 +76,7 @@ class BankInterface(commands.Cog, name="Bank"):
         else:
             user_id = ctx.author.id
 
-        author_account = self.bank[user_id]
+        author_account = self._bank[user_id]
         seconds = int(time()) - author_account.last_free_credits
 
         if seconds > 86400:
@@ -98,14 +98,14 @@ class BankInterface(commands.Cog, name="Bank"):
     async def free(self, ctx: Context):
         """Get your daily free credits"""
         user_id = ctx.author.id
-        author_account = self.bank[user_id]
+        author_account = self._bank[user_id]
         seconds = int(time()) - author_account.last_free_credits
 
         if seconds > 86400:
-            self.bank.transaction(
+            self._bank.transaction(
                 user_id=user_id, value=DAILY_CREDITS, reason="Free daily credits"
             )
-            self.bank.update_last_free_credits(user_id=user_id, new_time=int(time()))
+            self._bank.update_last_free_credits(user_id=user_id, new_time=int(time()))
             await ctx.reply(
                 f"Added {DAILY_CREDITS} credits to your account", mention_author=False
             )
@@ -125,7 +125,7 @@ class BankInterface(commands.Cog, name="Bank"):
         embed.title = "Transactions"
         embed.description = f"Transactions of <@{user_id}>"
 
-        for transaction in self.bank.get_transactions(user_id, limit):
+        for transaction in self._bank.get_transactions(user_id, limit):
             text = f"Amount: {transaction.amount}"
             if transaction.reason is not None:
                 text += f"\nReason: {transaction.reason}"
@@ -152,21 +152,21 @@ class BankInterface(commands.Cog, name="Bank"):
         embed.title = f"#{token}"
         embed.description = f"Transaction of <@{user_id}>"
 
-        transaction = self.bank.get_transaction(user_id, token)
-        embed.add_field(name=f"Amount", value=f"{transaction.amount}", inline=False)
+        transaction = self._bank.get_transaction(user_id, token)
+        embed.add_field(name="Amount", value=f"{transaction.amount}", inline=False)
 
         if transaction.reason is not None:
             reason = f"{transaction.reason}"
         else:
             reason = "Reason is not available"
-        embed.add_field(name=f"Reason", value=reason, inline=False)
+        embed.add_field(name="Reason", value=reason, inline=False)
 
         if transaction.amount < 0 and transaction.refundable:
             refundable = "Yes"
         else:
             refundable = "No"
-        embed.add_field(name=f"Refundable", value=refundable, inline=False)
-        embed.add_field(name=f"Date", value=f"{transaction.date}", inline=False)
+        embed.add_field(name="Refundable", value=refundable, inline=False)
+        embed.add_field(name="Date", value=f"{transaction.date}", inline=False)
 
         await ctx.reply(embed=embed, mention_author=False)
 
@@ -174,14 +174,14 @@ class BankInterface(commands.Cog, name="Bank"):
     @bank.command()
     async def add(self, ctx: Context, user: Union[discord.User, discord.Member], value: int):
         """Add some money to a user. WARNING: this will cause inflation"""
-        self.bank.transaction(user_id=user.id, value=value, reason=f"Added to <@{user.id}> by <@{ctx.author.id}>")
+        self._bank.transaction(user_id=user.id, value=value, reason=f"Added to <@{user.id}> by <@{ctx.author.id}>")
         await ctx.reply(f"Added {value} credits to <@{user.id}>", mention_author=False)
 
     @commands.is_owner()
     @bank.command()
     async def remove(self, ctx: Context, user: Union[discord.User, discord.Member], value: int):
         """Remove money from a user. WARNING: this will cause inflation"""
-        self.bank.transaction(user_id=user.id, value=-value, reason=f"Removed from <@{user.id}> by <@{ctx.author.id}>")
+        self._bank.transaction(user_id=user.id, value=-value, reason=f"Removed from <@{user.id}> by <@{ctx.author.id}>")
         await ctx.reply(f"Removed {value} credits from <@{user.id}>", mention_author=False)
 
     @commands.is_owner()
@@ -189,9 +189,9 @@ class BankInterface(commands.Cog, name="Bank"):
     async def cleanup(self, ctx: Context):
         members = list(self.bot.get_all_members())
         i = 0
-        for user_id in self.bank.users:
+        for user_id in self._bank.users:
             if get(members, id=user_id) is None:
-                del self.bank[user_id]
+                del self._bank[user_id]
                 i += 1
 
         await ctx.reply(f"Bank database cleaned from {i} users")
@@ -199,11 +199,11 @@ class BankInterface(commands.Cog, name="Bank"):
     @commands.is_owner()
     @bank.command()
     async def reset(self, ctx: Context):
-        self.bank.clear()
-        await ctx.reply(f"Cleared database", mention_author=True)
+        self._bank.clear()
+        await ctx.reply("Cleared database", mention_author=True)
 
     @bank.command()
     async def move(self, ctx: Context, user: Union[discord.User, discord.Member], value: int):
         value = abs(value)  # prevent money stealing
-        self.bank.move(from_user=ctx.author.id, to_user=user.id, value=value)
+        self._bank.move(from_user=ctx.author.id, to_user=user.id, value=value)
         await ctx.reply(f"Moved {value} credits to <@{user.id}>", mention_author=False)

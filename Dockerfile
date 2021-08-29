@@ -3,11 +3,11 @@ WORKDIR /bot
 
 COPY . .
 
-RUN apt update && apt install -y git \
+RUN apt-get update && apt-get install -y git \
     && /usr/local/bin/python -m pip install --upgrade pip \
     && pip install -i https://www.piwheels.org/simple/ --extra-index-url https://pypi.org/simple/ --no-cache-dir -r requirements.txt \
-    && apt purge -y git \
-    && apt autoremove --yes \
+    && apt-get purge -y git \
+    && apt-get autoremove --yes \
     && rm requirements.txt \
     && rm -rf /var/lib/apt/lists/*
 

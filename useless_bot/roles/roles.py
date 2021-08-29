@@ -26,7 +26,6 @@ class Roles(commands.Cog):
 
     async def cog_command_error(self, ctx: Context, error: str):
         # Handle the errors from the cog here
-        error_txt = f"{error}"
         if isinstance(error, BalanceNotSufficientError):
             await ctx.reply(
                 "Balance is not sufficient. Balance can't be negative",

@@ -33,34 +33,30 @@ class Settings(commands.Cog, name="Settings Menu"):
     @group(invoke_without_command=True, hidden=True)
     async def settings(self, ctx: Context):
         """Handles global bot configuration"""
-        pass
 
     @settings.group(invoke_without_command=True)
     async def roles(self, ctx: Context):
         """Handles roles configuration"""
-        pass
 
     @settings.group(invoke_without_command=True)
     async def sauce(self, ctx: Context):
         """Handles sauce configuration"""
-        pass
 
     @settings.group(invoke_without_command=True)
     async def meme(self, ctx: Context):
         """Handles meme configuration"""
-        pass
 
     @roles.command()
     async def price(self, ctx: Context, price: int):
         if price >= 0:
             self.roles.config["price"] = price
             await ctx.reply(
-                f"Price set",
+                "Price set",
                 mention_author=False,
             )
         else:
             await ctx.reply(
-                f"The price must be a positive integer",
+                "The price must be a positive integer",
                 mention_author=False,
             )
 

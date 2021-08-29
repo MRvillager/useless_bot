@@ -16,8 +16,8 @@ class Management(commands.Cog, name="Admin Menu"):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-        self.config = Config("Management")
-        self.config.setdefault("stalk_users", [])
+        self._config = Config("Management")
+        self._config.setdefault("stalk_users", [])
 
         self.meme = self.bot.get_cog("Meme")
         self.sauce = self.bot.get_cog("Sauce")
@@ -44,10 +44,10 @@ class Management(commands.Cog, name="Admin Menu"):
     @commands.Cog.listener()
     async def on_member_update(self, before: Member, after: Member):
         """Send a message in system channel when a stalked member is not more offline"""
-        if not self.config["stalk_users"]:
+        if not self._config["stalk_users"]:
             return
 
-        if before.id not in self.config["stalk_users"]:
+        if before.id not in self._config["stalk_users"]:
             return
 
         if before.status == after.status:
@@ -55,22 +55,22 @@ class Management(commands.Cog, name="Admin Menu"):
 
         logger.info("g")
         channel: TextChannel = after.guild.system_channel
-        await channel.send(f"## -- ## ATTENZIONE @everyone ## -- ##\n"
+        await channel.send("## -- ## ATTENZIONE @everyone ## -- ##\n"
                            f"il soggetto <@{after.id}> è online")
 
-        self.config["stalk_users"].remove(before.id)
+        self._config["stalk_users"].remove(before.id)
 
     @command(hidden=True)
     async def stalk(self, ctx: Context, user: Member):
         """Shutdown the bot"""
-        if user.id in self.config["stalk_users"]:
-            self.config["stalk_users"].remove(user.id)
+        if user.id in self._config["stalk_users"]:
+            self._config["stalk_users"].remove(user.id)
             await ctx.reply("Stalking removed", mention_author=False)
         else:
-            self.config["stalk_users"].append(user.id)
+            self._config["stalk_users"].append(user.id)
             await ctx.reply("Stalking started :)", mention_author=False)
 
-        self.config.push()
+        self._config.push()
 
     @is_owner()
     @command(hidden=True)
@@ -88,15 +88,15 @@ class Management(commands.Cog, name="Admin Menu"):
     @config.command(hidden=True, name="save")
     async def save_config(self, ctx: Context):
         """Save config to disk"""
-        self.config.push()
-        await ctx.reply(f"Settings saved", mention_author=False)
+        self._config.push()
+        await ctx.reply("Settings saved", mention_author=False)
 
     @is_owner()
     @config.command(hidden=True, name="load")
     async def load_config(self, ctx: Context):
         """Reload config from disk"""
-        self.config.pull()
-        await ctx.reply(f"Settings loaded", mention_author=False)
+        self._config.pull()
+        await ctx.reply("Settings loaded", mention_author=False)
 
     @is_owner()
     @command(hidden=True, name="forcerefresh")
@@ -105,7 +105,7 @@ class Management(commands.Cog, name="Admin Menu"):
         await self.meme.refresh()
         await self.sauce.refresh()
         await ctx.reply(
-            f"Forced refresh of submissions cache complete", mention_author=False
+            "Forced refresh of submissions cache complete", mention_author=False
         )
 
     @is_owner()

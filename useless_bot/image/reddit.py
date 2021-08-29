@@ -87,7 +87,7 @@ class RedditLister:
             "device_id": self.config["uuid"]
         }
 
-        async with self._session.post(url=f"https://www.reddit.com/api/v1/access_token", data=data,
+        async with self._session.post(url="https://www.reddit.com/api/v1/access_token", data=data,
                                       auth=self._basic_auth) as resp:
             resp_data = await resp.json()
 
@@ -141,7 +141,7 @@ class RedditLister:
         return posts
 
     async def hot(self, subreddits: Union[list[str], str], count: int = 0, limit: int = 25) -> list[Post]:
-        if type(subreddits) == list:
+        if type(subreddits) is list:
             subreddits_str = "+".join(subreddits)
         else:
             subreddits_str = subreddits

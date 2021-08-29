@@ -17,16 +17,16 @@ logger = logging.getLogger(__name__)
 async def response_content(status) -> str:
     """Parse player status and return a string"""
     if status == Status.Bust:
-        content = f"You busted"
+        content = "You busted"
     elif status == Status.Win:
-        content = f"You won"
+        content = "You won"
     elif status == Status.Lost:
-        content = f"You lost"
+        content = "You lost"
     elif status == Status.Push:
-        content = f"You tied with the dealer"
+        content = "You tied with the dealer"
     else:
         logger.error("Unexpected value for player status")
-        content = f"Error: report it to the bot owner"
+        content = "Error: report it to the bot owner"
     return content
 
 
@@ -122,7 +122,7 @@ class JoinButton(Button['Blackjack']):
             return payload.content.isdecimal() and payload.author == interaction.user
 
         try:
-            await interaction.response.send_message(f"Send now your bet", ephemeral=True)
+            await interaction.response.send_message("Send now your bet", ephemeral=True)
             msg = await view.bot.wait_for("message", check=check, timeout=15)
             bet = int(msg.content)
         except TimeoutError:
@@ -148,9 +148,9 @@ class LeaveButton(Button['Blackjack']):
 
         try:
             del view.players[interaction.user.id]
-            content = f"You have left the session"
+            content = "You have left the session"
         except KeyError:
-            content = f"You are not playing in the session"
+            content = "You are not playing in the session"
 
         await interaction.response.send_message(content, ephemeral=True)
 
@@ -311,8 +311,9 @@ class Blackjack(View):
             player_status = player.status
 
             if player.bet == 0:
-                return
-            elif player_status == Status.Win:
+                continue
+
+            if player_status == Status.Win:
                 self.bank.transaction(
                     user_id=user_id, value=player.bet * 2, reason="The user won a blackjack game"
                 )
@@ -320,7 +321,7 @@ class Blackjack(View):
                 self.bank.transaction(
                     user_id=user_id, value=player.bet, reason="The user pushed in blackjack"
                 )
-            elif player_status == Status.Lost or player_status == Status.Bust:
+            elif player_status in (Status.Lost, Status.Bust):
                 self.bank.transaction(
                     user_id=user_id, value=-player.bet, reason="The user lost in blackjack"
                 )
@@ -328,8 +329,8 @@ class Blackjack(View):
     async def game_page(self, interaction: Interaction):
         """Update the embed with the current game status"""
         embed = Embed()
-        embed.title = f"Blackjack"
-        embed.description = f"Game started"
+        embed.title = "Blackjack"
+        embed.description = "Game started"
 
         # dealer field
         if self.ending:
@@ -339,7 +340,7 @@ class Blackjack(View):
             hand = list(self.dealer.hand)
             hand_str = f"{hand[0]} + ? = ?\n"  # 10 + ? = ?\nPlay
 
-        embed.add_field(name=f"Dealer", value=hand_str, inline=False)
+        embed.add_field(name="Dealer", value=hand_str, inline=False)
 
         # players fields
         for user in self.players.values():

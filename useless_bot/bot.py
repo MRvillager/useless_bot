@@ -67,5 +67,5 @@ class UselessBot(commands.Bot):
         """Deny all messages except from owner when in debug mode"""
         if self.debug:
             return await self.is_owner(ctx.author)
-        else:
-            return True
+
+        return True

@@ -26,7 +26,8 @@ else:
     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 # initialize bot
-bot = UselessBot(debug=bool(getenv("DEBUG", 0)))
+debug = int(getenv("DEBUG", 0))
+bot = UselessBot(debug=bool(debug))
 
 if __name__ == "__main__":
     # run bot

@@ -29,10 +29,6 @@ class RedditCog(commands.Cog):
 
     def cog_unload(self):
         self.discord_bot.loop.run_until_complete(self.reddit.close())
-        self.unload()
-
-    def unload(self):
-        pass
 
     async def base_command(self, ctx: Context, *args: str):
         # check if channel is in whitelist
@@ -66,11 +62,12 @@ class RedditCog(commands.Cog):
     async def check_whitelist(self, ctx: Context):
         if not self.config["whitelist"]:
             return True
-        elif ctx.channel.id not in self.config["whitelist"]:
+
+        if ctx.channel.id not in self.config["whitelist"]:
             await ctx.message.delete()
             return False
-        else:
-            return True
+
+        return True
 
     async def get_custom_post(self, subreddits: str):
         post_list = await self.reddit.hot(subreddits, limit=5)

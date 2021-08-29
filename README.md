@@ -34,7 +34,7 @@ This is a self-hosted bot, so you will need to host and maintain your own instan
         ```
 7. Run the bot using \
    `python -m useless_bot`
-   
+
 ## Set-up with Docker
 
 ```bash

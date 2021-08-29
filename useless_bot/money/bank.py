@@ -22,10 +22,10 @@ def check_user_id(function: Callable):
 
         if len(user_id_str) not in [17, 18]:
             raise InvalidUserID
-        elif not user_id_str.isdigit():
+        if not user_id_str.isdigit():
             raise InvalidUserID
-        else:
-            value = function(self, user_id, *args, **kwargs)
+
+        value = function(self, user_id, *args, **kwargs)
 
         return value
 
@@ -40,7 +40,7 @@ def check_user_existence(add: bool = False):
         def wrapper(self: Bank, user_id: int, *args, **kwargs):
             if user_id not in self:
                 if add:
-                    self._unsafe_append(user_id)
+                    self.unsafe_append(user_id)
                 else:
                     raise UserIDNotRegistered
 
@@ -119,7 +119,7 @@ class Bank:
                 raise TokenGenerationError()
         return token_int
 
-    def _unsafe_append(self, user_id: int):
+    def unsafe_append(self, user_id: int):
         logger.debug(f"Adding <@{user_id}> to db")
         self._user_id_cache.append(user_id)
         self._cur.execute("Insert or Ignore Into users (user_id) values (:user_id)", {"user_id": user_id})
@@ -132,7 +132,7 @@ class Bank:
     @check_user_id
     def append(self, user_id: int):
         """Add a user in the database"""
-        self._unsafe_append(user_id)
+        self.unsafe_append(user_id)
 
     @check_user_id
     def remove(self, user_id: int):
@@ -160,7 +160,7 @@ class Bank:
         Reset database
         :return: None
         """
-        logger.critical(f"Cleaning-up all db")
+        logger.critical("Cleaning-up all db")
         self._user_id_cache = []
         self._cur.executescript("""
                                     DELETE FROM users;
@@ -171,7 +171,7 @@ class Bank:
     @property
     def users(self) -> tuple:
         """:return a tuple containing all the user ids in the database """
-        logger.info(f"retrieving all users in database")
+        logger.info("retrieving all users in database")
         user_ids = self._cur.execute("Select user_id From users")
         return tuple(map(lambda x: x[0], user_ids))
 

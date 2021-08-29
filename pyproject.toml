@@ -20,9 +20,8 @@ create_db = 'useless-bot.scripts.create_db:main'
 [tool.poetry.dependencies]
 python = "^3.9"
 discord-pretty-help = "*"
-multidict = "^5.1"
-aiohttp = { version = "^3.7.4", extras = ["speedups"] }
-uvloop = { version = "^0.15", markers = "sys_platform == 'linux'" }
+aiohttp = { version = ">=3.7.4", extras = ["speedups"] }
+uvloop = { version = "*", markers = "sys_platform == 'linux'" }
 "discord.py" = { git = "https://github.com/MRvillager/discord.py.git", extras = ["voice"] }
 
 [tool.poetry.dev-dependencies]

@@ -1,5 +1,6 @@
 import logging
 
+from discord import channel, TextChannel
 from discord.ext import commands
 from discord.ext.commands import group, Bot, Context, CommandError
 
@@ -61,49 +62,59 @@ class Settings(commands.Cog, name="Settings Menu"):
             )
 
     @meme.command(aliases=["subreddits"], usage="<subreddits...>", name="default")
-    async def m_default(self, ctx: Context, *args):
+    async def m_default(self, ctx: Context, *args: list[str]):
         """Get or edit the current default subreddits for memes"""
         if args:
-            await self.meme.source("+".join(list(args)))
+            await self.meme.source(args)
+
         await ctx.reply(
             f"Default subreddits: r/{' r/'.join(self.meme.config['subreddits'].split('+'))}",
             mention_author=False,
         )
 
     @meme.command(usage="<channels...>", name="whitelist")
-    async def m_whitelist(self, ctx: Context, *args):
+    async def m_whitelist(self, ctx: Context, *args: list[TextChannel]):
         """Get or edit the current channel whitelist for memes"""
         if args:
-            channels = [int(x.removeprefix("<#").removesuffix(">")) for x in args]
-            whitelist = args
+            x: TextChannel
+            channels = [x.id for x in args]
             self.meme.config["whitelist"] = channels
+
+            await ctx.reply(
+                "New whitelist set", mention_author=False
+            )
         else:
             whitelist = [f"<#{x}>" for x in self.meme.config["whitelist"]]
 
-        await ctx.reply(
-            f"Current whitelist: {' '.join(whitelist)}", mention_author=False
-        )
+            await ctx.reply(
+                f"Current whitelist: {' '.join(whitelist)}", mention_author=False
+            )
 
     @sauce.command(aliases=["subreddits"], usage="<subreddits...>", name="default")
-    async def s_default(self, ctx: Context, *args):
+    async def s_default(self, ctx: Context, *args: list[str]):
         """Get or edit the current default subreddits for sauce"""
         if len(args) != 0:
             await self.sauce.source(args)
+
         await ctx.reply(
             f"Default subreddits: r/{' r/'.join(self.sauce.config['subreddits'].split('+'))}",
             mention_author=False,
         )
 
     @sauce.command(usage="<channels...>", name="whitelist")
-    async def s_whitelist(self, ctx: Context, *args):
+    async def s_whitelist(self, ctx: Context, *args: list[TextChannel]):
         """Get or edit the current channel whitelist for sauce"""
         if args:
-            channels = [int(x.removeprefix("<#").removesuffix(">")) for x in args]
+            x: TextChannel
+            channels = [x.id for x in args]
             self.sauce.config["whitelist"] = channels
-            whitelist = args
-        else:
-            whitelist = [f"<#{x}>" for x in self.sauce.config["whitelist"]]
 
-        await ctx.reply(
-            f"Current whitelist: {' '.join(whitelist)}", mention_author=False
-        )
+            await ctx.reply(
+                "New whitelist set", mention_author=False
+            )
+        else:
+            whitelist = [f"<#{x}>" for x in self.meme.config["whitelist"]]
+
+            await ctx.reply(
+                f"Current whitelist: {' '.join(whitelist)}", mention_author=False
+            )

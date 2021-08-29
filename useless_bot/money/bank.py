@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os.path
 import sqlite3
 from functools import wraps
 from secrets import choice
@@ -8,6 +9,8 @@ from typing import Union, Callable, Optional, Iterable
 
 from .errors import *
 from .objects import TOKEN_CHARSET, TOKEN_LENGTH, User, Transaction
+
+DB_FILE = "data/data.sqlite"
 
 logger = logging.getLogger(__name__)
 
@@ -68,12 +71,18 @@ class Bank:
 
     def init_db(self):
         if self._db is None:
-            self._db = sqlite3.connect("data/data.sqlite", isolation_level=None,
+            if not os.path.isfile(DB_FILE):
+                with open("data/init.sql", "r") as f:
+                    sql_as_string = f.read()
+                create_db = True
+            else:
+                create_db = False
+
+            self._db = sqlite3.connect(DB_FILE, isolation_level=None,
                                        detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
 
-            with open("data/init.sql", "r") as f:
-                sql_as_string = f.read()
-            self._db.executescript(sql_as_string)
+            if create_db:
+                self._db.executescript(sql_as_string)
 
     @check_user_id
     @check_user_existence(add=True)

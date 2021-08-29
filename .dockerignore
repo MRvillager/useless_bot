@@ -5,3 +5,5 @@ README.md
 poetry.lock
 pyproject.toml
 setup.py
+Dockerfile
+Procfile

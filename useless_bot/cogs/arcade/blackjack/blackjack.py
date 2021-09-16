@@ -1,33 +1,19 @@
 import logging
+
 from random import shuffle
 from typing import Union, Optional
-
 from discord import ButtonStyle, Interaction, Message, Embed, Member, User
 from discord.ext.commands import Context
 from discord.ui import Button, View
 
+from useless_bot.core.bank_core import BankCore
+from useless_bot.core.errors import BalanceOverLimitError, BalanceUnderLimitError
 from .objects import Dealer
 from .objects import Status, Player
-from ...money.bank import Bank
-from ...money.errors import BalanceNotSufficientError
 
 logger = logging.getLogger(__name__)
 
-
-async def response_content(status) -> str:
-    """Parse player status and return a string"""
-    if status == Status.Bust:
-        content = "You busted"
-    elif status == Status.Win:
-        content = "You won"
-    elif status == Status.Lost:
-        content = "You lost"
-    elif status == Status.Push:
-        content = "You tied with the dealer"
-    else:
-        logger.error("Unexpected value for player status")
-        content = "Error: report it to the bot owner"
-    return content
+CREDITS_REQUIRED = 5
 
 
 class HitButton(Button['Blackjack']):
@@ -52,38 +38,6 @@ class HitButton(Button['Blackjack']):
                 player.append(self.view.deck.pop())
 
         await view.check_game(interaction)
-
-
-class DoubleDownButton(Button['Blackjack']):
-    def __init__(self):
-        super().__init__(style=ButtonStyle.blurple, label="Double Down", row=0, disabled=True)
-
-    # This function is called whenever this particular button is pressed
-    async def callback(self, interaction: Interaction):
-        if self.view is None:
-            return
-
-        view: Blackjack = self.view
-        try:
-            player: Player = view.players[interaction.user.id]
-        except KeyError:
-            await interaction.response.send_message("You are not playing in this session",
-                                                    ephemeral=True)
-        else:
-            if player.status == Status.Stand:  # if the player is standing, he cannot get new cards
-                await interaction.response.send_message("You are in stand. You must wait the end of the game",
-                                                        ephemeral=True)
-            elif player.bet:
-                try:
-                    view.bank.transaction(
-                        user_id=interaction.user.id, value=-player.bet, reason="The player used double-down"
-                    )
-                except BalanceNotSufficientError:
-                    await interaction.response.send_message("Balance not sufficient", ephemeral=True)
-                else:
-                    player.bet *= 2
-                    player.append(self.view.deck.pop())
-                    await view.check_game(interaction)
 
 
 class StandButton(Button['Blackjack']):
@@ -117,20 +71,8 @@ class JoinButton(Button['Blackjack']):
 
         view: Blackjack = self.view
 
-        # wait for start signal
-        def check(payload):
-            return payload.content.isdecimal() and payload.author == interaction.user
-
-        try:
-            await interaction.response.send_message("Send now your bet", ephemeral=True)
-            msg = await view.bot.wait_for("message", check=check, timeout=15)
-            bet = int(msg.content)
-        except TimeoutError:
-            bet = 0
-
         if interaction.user.id not in view.players.keys():
             player: Player = Player.from_discord(interaction.user)
-            player.bet = bet
             view.players[interaction.user.id] = player
             await view.start_page(interaction)
 
@@ -201,7 +143,7 @@ class Blackjack(View):
     deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] * 4
     ending = False
 
-    def __init__(self, ctx: Context, bank: Bank, author_bet: int = 0):
+    def __init__(self, ctx: Context, bank: BankCore):
         super().__init__()
 
         self.bot = ctx.bot
@@ -215,11 +157,9 @@ class Blackjack(View):
 
         self.dealer = Dealer()
         self.players: dict[int, Player] = {self.author.id: Player.from_discord(self.author)}
-        self.players[self.author.id].bet = author_bet
 
         # buttons
         self.add_item(HitButton())
-        self.add_item(DoubleDownButton())
         self.add_item(StandButton())
         self.add_item(JoinButton())
         self.add_item(LeaveButton())
@@ -310,21 +250,15 @@ class Blackjack(View):
         for user_id, player in self.players.items():
             player_status = player.status
 
-            if player.bet == 0:
+            try:
+                if player_status == Status.Win:
+                    self.bank.deposit(user=user_id, value=CREDITS_REQUIRED * 2)
+                elif player_status == Status.Push:
+                    self.bank.deposit(user=user_id, value=CREDITS_REQUIRED)
+                elif player_status in (Status.Lost, Status.Bust):
+                    self.bank.withdraw(user=user_id, value=CREDITS_REQUIRED)
+            except (BalanceUnderLimitError, BalanceOverLimitError):
                 continue
-
-            if player_status == Status.Win:
-                self.bank.transaction(
-                    user_id=user_id, value=player.bet * 2, reason="The user won a blackjack game"
-                )
-            elif player_status == Status.Push:
-                self.bank.transaction(
-                    user_id=user_id, value=player.bet, reason="The user pushed in blackjack"
-                )
-            elif player_status in (Status.Lost, Status.Bust):
-                self.bank.transaction(
-                    user_id=user_id, value=-player.bet, reason="The user lost in blackjack"
-                )
 
     async def game_page(self, interaction: Interaction):
         """Update the embed with the current game status"""
@@ -346,8 +280,6 @@ class Blackjack(View):
         for user in self.players.values():
             hand = " + ".join(user.hand)
             text = f"{hand} = {user.hand_value}"
-            if user.bet:
-                text += f"\nBet: {user.bet}"
             text += f"\n{user.status.name}"
 
             embed.add_field(

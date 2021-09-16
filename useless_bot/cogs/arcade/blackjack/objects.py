@@ -16,10 +16,9 @@ class Status(Enum):
 
 
 class Player:
-    def __init__(self, name: str, bet: int = 0):
+    def __init__(self, name: str):
         self._cards: list[int] = []
         self.name = name
-        self.bet = bet
         self._status = Status.Continue
 
     def append(self, val: int):

@@ -11,7 +11,7 @@ logging.basicConfig(
 )
 
 # get logger
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 # enable uvloop if available
 try:

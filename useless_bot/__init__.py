@@ -1,5 +1,5 @@
 __title__ = 'useless_bot'
 __author__ = 'MRvillager'
 __license__ = 'MIT'
-__copyright__ = 'Copyright 2021 John Toniutti'
-__version__ = '2.0.0b'
+__copyright__ = 'Copyright 2021 MRvillager'
+__version__ = '2.1'

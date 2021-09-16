@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "useless_bot"
-version = "2.0"
+version = "2.1"
 description = "self-hosted discord bot"
 license = "MIT"
-authors = ["John Toniutti <mrvillager.dev@gmail.com>"]
+authors = ["MRvillager <mrvillager.dev@gmail.com>"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
@@ -14,17 +14,19 @@ classifiers = [
     "Topic :: Communications :: Chat",
 ]
 
-[tool.poetry.scripts]
-create_db = 'useless-bot.scripts.create_db:main'
-
 [tool.poetry.dependencies]
 python = "^3.9"
 discord-pretty-help = "*"
+aiorwlock = "^1"
 aiohttp = { version = ">=3.7.4", extras = ["speedups"] }
 uvloop = { version = "*", markers = "sys_platform == 'linux'" }
-"discord.py" = { git = "https://github.com/MRvillager/discord.py.git", extras = ["voice"] }
+"py-cord" = { git = "https://github.com/Pycord-Development/pycord.git", extras = ["voice"] }
 
-[tool.poetry.dev-dependencies]
+orjson = { version = "^3", optional = true }
+aiofiles = { version = "^0.7", optional = true }
+
+[tool.poetry.extras]
+json = ["orjson", "aiofiles"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

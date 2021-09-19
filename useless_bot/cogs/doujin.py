@@ -6,7 +6,7 @@ from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import Bot, is_nsfw, Context, CommandError
 
-from utils import on_global_command_error
+from useless_bot.utils import on_global_command_error
 
 logger = logging.getLogger("useless_bot.cog.doujin")
 

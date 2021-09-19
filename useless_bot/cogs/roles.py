@@ -1,20 +1,21 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 
 from discord import Member, Guild, Role, Color
 from discord.ext import commands
-from discord.ext.commands import Bot, Context, group, check
+from discord.ext.commands import Bot, Context, group, check, CommandError
 
 from useless_bot.core.bank_core import BankCore
 from useless_bot.core.config import Config
 from useless_bot.core.drivers import Shelve
 from useless_bot.core.errors import BalanceUnderLimitError, BalanceOverLimitError
-from useless_bot.utils import is_admin
+from useless_bot.utils import is_admin, on_global_command_error
 
 schema = {"create_role_price": 75}
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("useless_bot.cog.roles")
 
 
 class Roles(commands.Cog):
@@ -24,24 +25,22 @@ class Roles(commands.Cog):
 
         self.config = Config(cog="Roles", driver=Shelve(), schema=schema)
 
-    async def cog_command_error(self, ctx: Context, error: str):
+    async def cog_command_error(self, ctx: Context, error: CommandError):
         # Handle the errors from the cog here
         if isinstance(error, BalanceUnderLimitError):
             await ctx.send("You don't have enough credits")
         elif isinstance(error, BalanceOverLimitError):
             await ctx.send("You have too much credits")
-        elif isinstance(error, commands.BadArgument):
-            await ctx.send("Passed arguments are not correct")
         else:
-            await ctx.send("An error happened. Retry later")
-            logger.error(f"Error in Roles: {error}")
+            if not await on_global_command_error(ctx, error):
+                logger.error(f"Exception occurred", exc_info=True)
 
     @group(invoke_without_command=True, hidden=True)
-    async def roles(self, ctx: Context):
-        """Handles roles commands"""
+    async def role(self, ctx: Context):
+        """Handles role commands"""
         pass
 
-    @roles.command()
+    @role.command()
     async def create(self, ctx: Context, name: str, color: Color = None):
         """Create a role for an amount of credits"""
         role_price = await self.config.get(["create_role_price"])
@@ -63,7 +62,7 @@ class Roles(commands.Cog):
             mention_author=False,
         )
 
-    @roles.command()
+    @role.command()
     @check(is_admin)
     async def color(self, ctx: Context, role: Role, color: Color = None):
         """Change color to a role"""
@@ -73,9 +72,10 @@ class Roles(commands.Cog):
         await role.edit(color=color)
         await ctx.send(f"Changed color to {role.mention}")
 
-    @roles.command()
+    @role.command()
     @check(is_admin)
     async def delete(self, ctx: Context, role: Role):
         """Delete a role"""
         await ctx.send(f"Deleted {role.mention}")
+        await asyncio.sleep(5)
         await role.delete(reason=f"{ctx.author.mention} has requested it")

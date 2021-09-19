@@ -1,7 +1,7 @@
 import pickle
 import shelve
-
 from typing import Any
+
 from aiorwlock import RWLock
 
 from .base import Base, KeysSet
@@ -13,7 +13,7 @@ class Shelve(Base):
 
     _lock = RWLock()
 
-    def __init__(self, *, file: str = "data/config.shelf"):
+    def __init__(self, *, file: str = "data/config"):
         self._file = file
 
         # Initialize _data
@@ -31,11 +31,11 @@ class Shelve(Base):
     async def set(self, cog: str, keys: KeysSet, value: Any):
         partial = self.__class__._data[cog]
 
-        for key in keys:
+        for key in keys[:-1]:
             partial = partial[key]
 
         # noinspection PyUnusedLocal
-        partial = value
+        partial[keys[-1]] = value
 
     async def get(self, cog: str, keys: KeysSet) -> Any:
         partial = self.__class__._data[cog]
@@ -64,7 +64,7 @@ class Shelve(Base):
         del self.__class__._data[cog]
 
     async def dump(self):
-        with self._lock.writer_lock:
+        async with self._lock.writer_lock:
             # write updated data to file
             self._data.sync()
 

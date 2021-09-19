@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "useless_bot"
-version = "2.1"
+version = "2.2"
 description = "self-hosted discord bot"
 license = "MIT"
 authors = ["MRvillager <mrvillager.dev@gmail.com>"]

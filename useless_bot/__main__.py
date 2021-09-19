@@ -1,17 +1,34 @@
-# global import
 import logging
+import platform
 from os import getenv
 
 from .bot import UselessBot
+from .utils import set_up_logging
 
-# set-up logging
-logging.basicConfig(
-    format="%(asctime)s - %(filename)s - %(funcName)s - %(levelname)s: %(message)s",
-    level=logging.INFO,
-)
+set_up_logging()
+logger = logging.getLogger("useless_bot")
 
-# get logger
-logger = logging.getLogger()
+logger.info("Initializing Bot")
+
+# silence error on closing
+if platform.system() == 'Windows':
+    from functools import wraps
+    from asyncio.proactor_events import _ProactorBasePipeTransport
+
+
+    def silence_event_loop_closed(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            try:
+                return func(self, *args, **kwargs)
+            except RuntimeError as e:
+                if str(e) != 'Event loop is closed':
+                    raise
+
+        return wrapper
+
+
+    _ProactorBasePipeTransport.__del__ = silence_event_loop_closed(_ProactorBasePipeTransport.__del__)
 
 # enable uvloop if available
 try:
@@ -25,10 +42,13 @@ else:
     logger.info("Using uvloop")
     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
-# initialize bot
-debug = int(getenv("DEBUG", 0))
-bot = UselessBot(debug=bool(debug))
-
 if __name__ == "__main__":
+    # initialize bot
+    debug = int(getenv("DEBUG", 0))
+    bot = UselessBot(debug=bool(debug))
+
+    logger.debug("Bot initialization complete")
+
     # run bot
+    logger.info("Running bot")
     bot.run(getenv("DISCORD_TOKEN"))

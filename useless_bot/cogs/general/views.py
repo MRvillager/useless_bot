@@ -3,7 +3,7 @@ import discord
 
 class WarnLimit(discord.ui.View):
     def __init__(self, user: discord.Member):
-        super().__init__()
+        super().__init__(timeout=30)
         self.user = user
         self.click = False
 

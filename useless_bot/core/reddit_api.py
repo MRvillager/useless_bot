@@ -1,22 +1,21 @@
 from __future__ import annotations
 
-import asyncio
-import aiohttp
 import logging
-
-from asyncio import AbstractEventLoop
 from dataclasses import dataclass
 from time import time
 from typing import Optional, Union
 from uuid import uuid4
+
+import aiohttp
 from aiohttp.web_exceptions import HTTPException
 from yarl import URL
 
-from useless_bot import __version__, __author__
 from .config import Config
 from .drivers import Shelve
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("useless_bot.core.reddit_api")
+
+schema = {"uuid": str(uuid4())}
 
 
 @dataclass(frozen=True)
@@ -59,45 +58,33 @@ class RedditAPI:
                  client_id: str,
                  client_secret: str,
                  *,
-                 loop: Optional[AbstractEventLoop] = None,
-                 connector: Optional[aiohttp.TCPConnector] = None,
-                 useragent: str = f"python:useless-bot:{__version__} (by /u/{__author__})",
+                 session: aiohttp.ClientSession,
+                 headers: dict
                  ):
         """
         Initialize aiohttp session and config
         :param loop: a custom event loop
         :param useragent: a custom user agent to use
         """
-        self.loop: AbstractEventLoop = asyncio.get_event_loop() if loop is None else loop
-        self.config = Config(cog="RedditAPI", driver=Shelve())
-
-        self.config.setdefault(["uuid"], str(uuid4()))
-
-        self.headers = {
-            "User-Agent": useragent
-        }
+        self.config = Config(cog="RedditAPI", driver=Shelve(), schema=schema)
         self._basic_auth = aiohttp.BasicAuth(client_id, client_secret)
-        self._conn = aiohttp.TCPConnector(ttl_dns_cache=600, limit=100) if connector is not None else connector
-        self._session = aiohttp.ClientSession(connector=self._conn, headers=self.headers, loop=self.loop)
-
-    async def close(self):
-        await self._session.close()
+        self.headers = headers
+        self._session = session
 
     async def _auth(self):
         """Authorize bot and save bearer token"""
         logging.info("Starting authentication with RedditAPI")
         data = {
             "grant_type": "https://oauth.reddit.com/grants/installed_client",
-            "device_id": self.config.get(["uuid"])
+            "device_id": await self.config.get(["uuid"])
         }
 
         async with self._session.post(url=URL("https://www.reddit.com/api/v1/access_token"),
-                                      data=data,
-                                      auth=self._basic_auth) as resp:
+                                      data=data, auth=self._basic_auth) as resp:
             resp_data = await resp.json()
 
         if "error" in resp_data.keys():
-            logger.error(f"Failed to authenticate with RedditAPI: {resp_data['error']}")
+            logger.error(f"Failed to authenticate with RedditAPI: {resp_data} - {data}")
             raise HTTPException
 
         logging.info("Authentication with RedditAPI successful")
@@ -139,7 +126,7 @@ class RedditAPI:
             listing = await resp.json()
 
         if "error" in listing.keys():
-            logger.error(f"Cannot get posts from RedditAPI: {listing['error']}, endpoint={endpoint}")
+            logger.error(f"Cannot get posts from RedditAPI: {listing}, endpoint={endpoint}")
             raise Forbidden
 
         logging.info("Successful retrieved posts from RedditAPI")
@@ -158,20 +145,20 @@ class RedditAPI:
             subreddits_str = subreddits
         return await self.listing(endpoint=f"/r/{subreddits_str}/hot.json", count=count, limit=limit)
 
-    async def link(self, link: Union[str, URL]) -> Post:
+    async def link(self, link: str) -> Post:
         if self.expires_in <= self.last_auth_time:
             logging.debug("Token has expired")
             await self._auth()
 
-        post_url = URL(link.removesuffix("/") + ".json").with_host("oauth.reddit.com")
+        post_url = URL(link.removesuffix("/").removesuffix(".json") + ".json").with_host("oauth.reddit.com")
         logging.info("Getting post from Reddit API")
         async with self._session.get(url=post_url, headers=self.headers) as resp:
-            post = await resp.json()
+            posts = await resp.json()
 
-        if "error" in post.keys():
-            logger.error(f"Cannot get post from RedditAPI: {post['error']}, url={post_url}")
+        if type(posts) is dict:
+            logger.error(f"Cannot get post from RedditAPI: {posts['error']}, url={post_url}")
             raise Forbidden
 
         logging.info("Successful retrieved post from RedditAPI")
 
-        return Post.from_api(post)
+        return Post.from_api(posts[0]["data"]["children"][0]["data"])

@@ -1,45 +1,41 @@
 import logging
 import re
-import aiohttp
 
-from typing import Optional
+import aiohttp
 from discord import Embed
 from discord.ext import commands
-from discord.ext.commands import Bot, is_nsfw, Context
+from discord.ext.commands import Bot, is_nsfw, Context, CommandError
 
-logger = logging.getLogger(__name__)
+from utils import on_global_command_error
+
+logger = logging.getLogger("useless_bot.cog.doujin")
 
 
 class Code(commands.Converter, str):
     async def convert(self, _: Context, argument: str) -> str:
-        if argument.isdecimal():
+        if not argument.isdecimal():
             raise TypeError("A code must be an integer")
-        elif len(argument) != 6:
-            raise TypeError("A code must have 6 digits")
+        elif len(argument) > 6:
+            raise TypeError("A code must have less or equal than 6 digits")
 
         return argument
 
 
 class Doujin(commands.Cog):
-    def __init__(self, discord_bot: Bot, connector: aiohttp.BaseConnector):
+    def __init__(self, discord_bot: Bot, session: aiohttp.ClientSession):
         self.bot = discord_bot
+        self.session = session
 
-        self.session = aiohttp.ClientSession(loop=self.bot.loop,
-                                             connector=connector)
-
-    async def cog_command_error(self, ctx: Context, error: Exception) -> None:
-        if isinstance(error, commands.BadArgument):
-            await ctx.send("Passed arguments are not correct")
-        else:
-            await ctx.send("An error happened. Retry later")
-            logger.error(f"Error in Settings: {error}")
+    async def cog_command_error(self, ctx: Context, error: CommandError) -> None:
+        if not await on_global_command_error(ctx, error):
+            logger.error(f"Exception occurred", exc_info=True)
 
     @is_nsfw()
     @commands.command()
-    async def doujin(self, ctx: Context, code: Optional[Code] = None):
+    async def doujin(self, ctx: Context, code: Code = None):
         """Get random ragu from doujin.net"""
         if code:
-            url = f"https://nhentai.net/g/{code}"
+            url = f"https://nhentai.net/g/{code}/"
             logger.info(f"Retrieving {code} from nhentai.net")
             async with self.session.get(url, allow_redirects=False) as resp:
                 content = await resp.text()

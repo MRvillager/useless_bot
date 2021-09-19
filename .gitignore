@@ -85,3 +85,5 @@ known_hosts
 data/config/*.json
 data/config.json
 data/*.sqlite
+
+data/

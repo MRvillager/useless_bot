@@ -1,8 +1,8 @@
 import logging
-import discord
-
 from time import time
 from typing import Union, Optional
+
+import discord
 from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import Bot, group, Context, CommandError
@@ -12,9 +12,10 @@ from useless_bot.core.bank_core import BankCore
 from useless_bot.core.config import Config
 from useless_bot.core.drivers import Shelve
 from useless_bot.core.errors import *
+from useless_bot.utils import on_global_command_error
 
 schema = {"free_credits": 15}
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("useless_bot.cog.bank")
 
 
 class Bank(commands.Cog, name="Bank"):
@@ -35,11 +36,9 @@ class Bank(commands.Cog, name="Bank"):
             await ctx.send("You have too much credits")
         elif isinstance(error, KeyError):
             await ctx.send("It doesn't seem you have a bank. Use `-bank` to create one")
-        elif isinstance(error, commands.BadArgument):
-            await ctx.send("Passed arguments are not correct")
         else:
-            await ctx.send("An error happened. Retry later")
-            logger.error(f"Error in BankCog: {error}")
+            if not await on_global_command_error(ctx, error):
+                logger.error(f"Exception occurred", exc_info=True)
 
     @staticmethod
     def gen_wait_str(seconds: int):

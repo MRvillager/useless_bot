@@ -1,7 +1,7 @@
 import logging
-
 from random import shuffle
 from typing import Union, Optional
+
 from discord import ButtonStyle, Interaction, Message, Embed, Member, User
 from discord.ext.commands import Context
 from discord.ui import Button, View
@@ -11,9 +11,7 @@ from useless_bot.core.errors import BalanceOverLimitError, BalanceUnderLimitErro
 from .objects import Dealer
 from .objects import Status, Player
 
-logger = logging.getLogger(__name__)
-
-CREDITS_REQUIRED = 5
+logger = logging.getLogger("useless_bot.cog.arcade.blackjack")
 
 
 class HitButton(Button['Blackjack']):
@@ -143,11 +141,12 @@ class Blackjack(View):
     deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] * 4
     ending = False
 
-    def __init__(self, ctx: Context, bank: BankCore):
+    def __init__(self, ctx: Context, bank: BankCore, game_cost: int = 5):
         super().__init__()
 
         self.bot = ctx.bot
         self.bank = bank
+        self.bet = game_cost
         self.max_players = 4
 
         self.author: Union[User, Member] = ctx.author
@@ -252,11 +251,9 @@ class Blackjack(View):
 
             try:
                 if player_status == Status.Win:
-                    self.bank.deposit(user=user_id, value=CREDITS_REQUIRED * 2)
-                elif player_status == Status.Push:
-                    self.bank.deposit(user=user_id, value=CREDITS_REQUIRED)
+                    self.bank.deposit(user=user_id, value=self.bet * 2)
                 elif player_status in (Status.Lost, Status.Bust):
-                    self.bank.withdraw(user=user_id, value=CREDITS_REQUIRED)
+                    self.bank.withdraw(user=user_id, value=self.bet)
             except (BalanceUnderLimitError, BalanceOverLimitError):
                 continue
 

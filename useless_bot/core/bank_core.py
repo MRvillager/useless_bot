@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import logging
-
 from dataclasses import dataclass, asdict
 from typing import Union, Final, AsyncIterator
+
 from discord import User, Member
 
 from .config import Config
@@ -12,7 +12,11 @@ from .errors import BalanceOverLimitError, BalanceUnderLimitError
 
 MAX_BALANCE: Final = pow(2, 32)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("useless_bot.core.bank_core")
+
+schema = {
+    "users": {}
+}
 
 
 @dataclass()
@@ -26,8 +30,7 @@ class BankCore:
     _config: Config
 
     def __init__(self):
-        self.__class__._config = Config(Shelve(), cog="BankCore")
-        self._config.setdefault(keys=["users"], value={})
+        self.__class__._config = Config(Shelve(), cog="BankCore", schema=schema)
 
     async def add_user(self, user: Union[User, Member, int]):
         """Add a user in the database"""
@@ -44,8 +47,14 @@ class BankCore:
         else:
             user_id = user.id
 
-        user = await self._config.get(keys=("users", user_id))
-        return BankUser(**user)
+        try:
+            user_data = await self._config.get(keys=("users", user_id))
+            user = BankUser(**user_data)
+        except KeyError:
+            user = BankUser(user_id)
+            await self._config.set(keys=("users", user_id), value=asdict(user))
+        finally:
+            return user
 
     async def del_user(self, user: Union[User, Member, int]):
         if type(user) is int:
@@ -58,8 +67,8 @@ class BankCore:
     async def balance(self, user: Union[User, Member]) -> int:
         return await self._config.get(keys=("users", user.id, "balance"))
 
-    async def last_free_credits(self, user: Union[User, Member]):
-        await self._config.get(keys=("users", user.id, "last_free_credits"))
+    async def last_free_credits(self, user: Union[User, Member]) -> int:
+        return await self._config.get(keys=("users", user.id, "last_free_credits"))
 
     async def update_last_free_credits(self, user: Union[User, Member], new_time: int):
         await self._config.set(keys=("users", user.id, "last_free_credits"), value=new_time)
@@ -90,7 +99,7 @@ class BankCore:
             user_id = user.id
 
         logger.debug(f"Withdrawing {value} credits from {user_id}")
-        value = self._subtraction(user, value)
+        value = await self._subtraction(user, value)
         await self._config.set(keys=("users", user_id, "balance"), value=value)
         logger.debug(f"Withdraw of {value} credits from {user_id}")
 
@@ -101,7 +110,7 @@ class BankCore:
             user_id = user.id
 
         logger.debug(f"Depositing {value} credits to {user_id}")
-        value = self._addition(user, value)
+        value = await self._addition(user, value)
         await self._config.set(keys=("users", user_id, "balance"), value=value)
         logger.debug(f"Deposit of {value} credits to {user_id} complete")
 

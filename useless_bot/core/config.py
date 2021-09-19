@@ -1,12 +1,12 @@
 import logging
-
 from contextlib import asynccontextmanager
 from typing import Any
+
 from aiorwlock import RWLock
 
 from .drivers import Base, KeysSet
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("useless_bot.core.config")
 
 
 class Config:
@@ -29,12 +29,12 @@ class Config:
         self._in_transaction = False
 
     async def get(self, keys: KeysSet) -> Any:
-        with self._lock.reader_lock:
+        async with self._lock.reader_lock:
             logging.debug(f"Getting value for {self._cog}/{keys}")
             return await self._driver.get(cog=self._cog, keys=keys)
 
     async def set(self, keys: KeysSet, value: Any):
-        with self._lock.writer_lock:
+        async with self._lock.writer_lock:
             logging.debug(f"Setting value for {self._cog}/{keys}")
             await self._driver.set(cog=self._cog, keys=keys, value=value)
 
@@ -43,7 +43,7 @@ class Config:
                 await self.save()
 
     async def delete(self, keys: KeysSet):
-        with self._lock.writer_lock:
+        async with self._lock.writer_lock:
             logging.debug(f"Deleting value for {self._cog}/{keys}")
             await self._driver.delete(cog=self._cog, keys=keys)
 
@@ -52,7 +52,7 @@ class Config:
                 await self.save()
 
     async def setdefault(self, keys: KeysSet, value: Any) -> Any:
-        with self._lock.writer_lock:
+        async with self._lock.writer_lock:
             await self._driver.setdefault(cog=self._cog, keys=keys, value=value)
 
             if not self._in_transaction:

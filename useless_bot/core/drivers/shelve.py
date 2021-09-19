@@ -11,10 +11,11 @@ class Shelve(Base):
     _data: shelve.Shelf = None
     _file: str
 
-    _lock = RWLock()
+    _lock: RWLock
 
     def __init__(self, *, file: str = "data/config"):
         self._file = file
+        self._lock = RWLock()
 
         # Initialize _data
         if not self._data:

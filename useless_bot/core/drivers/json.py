@@ -17,11 +17,12 @@ class Json(Base):
     _file: str
     _auto_save: bool
 
-    _lock = RWLock()
+    _lock: RWLock
 
     def __init__(self, *, auto_save: bool = True, file: str = "data/config.json"):
         self.__class__.file = file
         self.__class__._auto_save = auto_save
+        self._lock = RWLock()
 
         # load data
         if not self._data:

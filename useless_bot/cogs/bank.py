@@ -24,7 +24,7 @@ class Bank(commands.Cog, name="Bank"):
     def __init__(self, bot: Bot, bank: BankCore):
         self.bot = bot
 
-        self.config = Config(cog="Bank", driver=Shelve(), schema=schema)
+        self.config = Config(cog="Bank", schema=schema)
 
         # bank init
         self._bank = bank

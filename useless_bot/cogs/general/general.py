@@ -28,7 +28,7 @@ class General(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-        self.config = Config(cog="General", driver=Shelve(), schema=schema)
+        self.config = Config(cog="General", schema=schema)
 
         self.meme = self.bot.get_cog("Meme")
         self.sauce = self.bot.get_cog("Sauce")

@@ -30,7 +30,7 @@ class BankCore:
     _config: Config
 
     def __init__(self):
-        self.__class__._config = Config(Shelve(), cog="BankCore", schema=schema)
+        self.__class__._config = Config("BankCore", schema=schema)
 
     async def add_user(self, user: Union[User, Member, int]):
         """Add a user in the database"""

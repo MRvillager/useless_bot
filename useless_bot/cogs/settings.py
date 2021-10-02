@@ -33,7 +33,7 @@ class Settings(commands.Cog):
         if not await on_global_command_error(ctx, error):
             logger.error(f"Exception occurred", exc_info=True)
 
-    @group(invoke_without_command=True, hidden=True)
+    @group(invoke_without_command=True)
     async def settings(self, ctx: Context):
         """Handles global bot configuration"""
 

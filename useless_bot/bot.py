@@ -10,7 +10,7 @@ from discord.ext.commands import check, errors, Context
 from pretty_help import PrettyHelp
 
 from . import __version__, __author__, __title__
-from .cogs import system, settings, roles, reddit, doujin, bank, general, arcade
+from .cogs import system, settings, roles, reddit, doujin, bank, general, arcade, music
 from .core import bank_core, reddit_api
 
 logger = logging.getLogger("useless_bot.bot")
@@ -32,7 +32,8 @@ class UselessBot(commands.Bot):
         super().__init__(command_prefix=commands.when_mentioned_or("-"),
                          description="a useless bot",
                          case_insensitive=True,
-                         intents=Intents(guilds=True, guild_messages=True, reactions=True, members=True),
+                         intents=Intents(guilds=True, guild_messages=True, reactions=True, members=True,
+                                         presences=True),
                          connector=self._conn,
                          loop=self.loop,
                          help_command=PrettyHelp())
@@ -58,6 +59,7 @@ class UselessBot(commands.Bot):
         self.add_cog(general.General(self))
         self.add_cog(settings.Settings(self))
         self.add_cog(system.System(self))
+        self.add_cog(music.Music(self))
 
     async def on_ready(self):
         """Log the start of bot"""

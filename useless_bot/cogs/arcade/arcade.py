@@ -22,7 +22,7 @@ class Arcade(commands.Cog, name="Games"):
         self.bot = bot
         self.bank = bank
 
-        self.config = Config(cog="Arcade", driver=Shelve(), schema=schema)
+        self.config = Config(cog="Arcade", schema=schema)
 
     # noinspection PyUnusedLocal
     async def cog_command_error(self, ctx: Context, error: CommandError):

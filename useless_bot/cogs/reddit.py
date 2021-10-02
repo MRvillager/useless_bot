@@ -45,7 +45,7 @@ class Reddit(commands.Cog):
         self.nsfw_cache: list[Post] = []
 
         # init/load cog config
-        self.config = Config(cog="Reddit", driver=Shelve(), schema=schema)
+        self.config = Config(cog="Reddit", schema=schema)
 
     async def cog_command_error(self, ctx: Context, error: CommandError) -> None:
         if isinstance(error, Forbidden):

@@ -124,7 +124,6 @@ class VoiceState:
         self.skip_votes.clear()
 
         if self.is_playing():
-            self.voice.channel.count()
             self.voice.stop()
 
     def _play(self, error: Optional = None):
@@ -132,6 +131,8 @@ class VoiceState:
             logger.warning(error)
         if not self._queue.is_empty:
             self.bot.loop.call_soon_threadsafe(self._play_next_song.set)
+        else:
+            self.current = None
 
     def play(self):
         if not self.is_playing():

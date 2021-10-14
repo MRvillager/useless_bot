@@ -4,7 +4,7 @@ from discord.errors import Forbidden
 from discord.ext.commands import Context, errors
 
 
-root_logger = logging.getLogger()
+base_logger = logging.getLogger("useless_bot")
 
 
 async def is_admin(ctx: Context):
@@ -14,7 +14,7 @@ async def is_admin(ctx: Context):
 
 def set_up_logging():
     # Get loggers
-    base_logger = logging.getLogger("useless_bot")
+    root_logger = logging.getLogger()
     dpy_logger = logging.getLogger("discord")
     aiohttp_logger = logging.getLogger('aiohttp.client')
     ydl_logger = logging.getLogger('youtube_dl')
@@ -54,7 +54,7 @@ async def on_global_command_error(ctx: Context, error: errors.CommandError) -> b
         await ctx.send(f"This command is in cooldown. Retry after {error.retry_after} seconds")
     elif isinstance(error, errors.MaxConcurrencyReached):
         await ctx.send("An error happened. Retry later")
-        logger.critical("Max concurrency reached. You may need to scale up the bot")
+        base_logger.critical("Max concurrency reached. You may need to scale up the bot")
     elif isinstance(error, errors.NotOwner):
         pass
     elif isinstance(error, (errors.BotMissingPermissions, errors.MissingPermissions, Forbidden)):

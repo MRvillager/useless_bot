@@ -1,18 +1,17 @@
 import asyncio
-from typing import Union, TYPE_CHECKING
-
+import logging
 import discord
 import youtube_dl
-import logging
 
-from discord import Bot, Member, TextChannel
+from typing import Union, TYPE_CHECKING
+from discord import Bot
 from discord.ext import commands
 from discord.ext.commands import Context, has_permissions, bot_has_permissions, CommandError
 
 from useless_bot.core.ytdl_options import ytdl_format_options, ffmpeg_options
 from useless_bot.utils import on_global_command_error
+from .errors import *
 from .voice import VoiceState, VoiceEntry, VoiceData
-from .errors import NotFound, AuthorNotConnected
 from .yt import YTLink, YTLinkConverter
 
 __all__ = [
@@ -31,9 +30,11 @@ class Music(commands.Cog):
 
     async def cog_command_error(self, ctx: Context, error: CommandError) -> None:
         if isinstance(error, AuthorNotConnected):
-            pass
+            await ctx.send("You are not connected to a voice channel")
         elif isinstance(error, NotFound):
             await ctx.send("Cannot play this URL")
+        elif isinstance(error, URLNotSupported):
+            await ctx.send("This URL is not supported")
         elif not await on_global_command_error(ctx, error):
             logger.error(f"Exception occurred", exc_info=True)
 
@@ -145,7 +146,6 @@ class Music(commands.Cog):
             if ctx.author.voice:
                 await ctx.author.voice.channel.connect()
             else:
-                await ctx.send("You are not connected to a voice channel.")
                 raise AuthorNotConnected("Author not connected to a voice channel.")
 
     @commands.command()

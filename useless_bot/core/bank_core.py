@@ -7,7 +7,6 @@ from typing import Union, Final, AsyncIterator
 from discord import User, Member
 
 from .config import Config
-from .drivers import Shelve
 from .errors import BalanceOverLimitError, BalanceUnderLimitError
 
 MAX_BALANCE: Final = pow(2, 32)

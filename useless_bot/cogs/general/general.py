@@ -5,7 +5,6 @@ from discord.ext import commands
 from discord.ext.commands import Bot, Context, CommandError, has_permissions, bot_has_permissions
 
 from useless_bot.core.config import Config
-from useless_bot.core.drivers import Shelve
 from useless_bot.utils import on_global_command_error
 from .views import WarnLimit
 

@@ -9,7 +9,6 @@ from discord.ext import commands
 from discord.ext.commands import Bot, Context, is_nsfw, CommandError
 
 from useless_bot.core.config import Config
-from useless_bot.core.drivers import Shelve
 from useless_bot.core.reddit_api import RedditAPI, Post, Forbidden
 from useless_bot.utils import on_global_command_error
 

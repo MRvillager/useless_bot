@@ -1,8 +1,8 @@
-from youtube_dl import extractor
-from functools import cache, lru_cache
+from functools import lru_cache
 from discord.ext import commands
 from discord.ext.commands import Context, CommandError
-
+from youtube_dl import extractor
+from .errors import URLNotSupported
 
 __all__ = [
     "YTLink",
@@ -24,7 +24,7 @@ class YTLinkConverter(commands.Converter):
             if ext.suitable(url):
                 return True
 
-        raise CommandError("URL not supported")
+        raise URLNotSupported("URL not supported")
 
     async def convert(self, ctx: Context, argument: str) -> YTLink:
         # TODO: link parsing

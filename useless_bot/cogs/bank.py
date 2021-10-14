@@ -10,7 +10,6 @@ from discord.utils import get
 
 from useless_bot.core.bank_core import BankCore
 from useless_bot.core.config import Config
-from useless_bot.core.drivers import Shelve
 from useless_bot.core.errors import *
 from useless_bot.utils import on_global_command_error
 

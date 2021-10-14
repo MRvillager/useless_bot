@@ -3,7 +3,6 @@ import logging
 from discord.errors import Forbidden
 from discord.ext.commands import Context, errors
 
-
 base_logger = logging.getLogger("useless_bot")
 
 

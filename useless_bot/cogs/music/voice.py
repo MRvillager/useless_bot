@@ -2,11 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import discord
 
 from typing import Optional, Any
-from discord import TextChannel, Member, PCMVolumeTransformer, Bot, VoiceClient, FFmpegPCMAudio
-from discord.ext import commands
+from discord import Member, PCMVolumeTransformer, Bot, VoiceClient, FFmpegPCMAudio
 
 from useless_bot.core.queue import SongQueue
 

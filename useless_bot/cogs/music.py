@@ -1,16 +1,15 @@
 import asyncio
-import re
 import logging
-
+import re
 from asyncio import sleep
 from typing import Union
-from discord import Embed, VoiceClient
+
+from discord import VoiceClient
 from discord.ext import commands
-from discord.ext.commands import Bot, is_nsfw, Context, CommandError, bot_has_permissions
+from discord.ext.commands import Bot, Context, CommandError
 from discord.types import snowflake
 
 from useless_bot.core.ytdl import YTDL, NotFound, QueueEnd
-from useless_bot.utils import on_global_command_error
 
 logger = logging.getLogger("useless_bot.cog.music")
 
@@ -39,7 +38,7 @@ class Music(commands.Cog):
             await ctx.send("Nothing found")
         elif isinstance(error, asyncio.exceptions.TimeoutError):
             pass
-        #elif not await on_global_command_error(ctx, error):
+        # elif not await on_global_command_error(ctx, error):
         else:
             logger.error(f"Exception occurred", exc_info=True)
 

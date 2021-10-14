@@ -9,7 +9,6 @@ from discord.ext.commands import Bot, Context, group, check, CommandError
 
 from useless_bot.core.bank_core import BankCore
 from useless_bot.core.config import Config
-from useless_bot.core.drivers import Shelve
 from useless_bot.core.errors import BalanceUnderLimitError, BalanceOverLimitError
 from useless_bot.utils import is_admin, on_global_command_error
 
@@ -23,7 +22,7 @@ class Roles(commands.Cog):
         self.bot = bot
         self.bank = bank
 
-        self.config = Config(cog="Roles",  schema=schema)
+        self.config = Config(cog="Roles", schema=schema)
 
     async def cog_command_error(self, ctx: Context, error: CommandError):
         # Handle the errors from the cog here

@@ -164,6 +164,7 @@ class Music(commands.Cog):
                 raise commands.CommandError("Author not connected to a voice channel.")
 
     async def _search_query_multiple(self, ctx: Context, query: str) -> list[VoiceData]:
+        pass
 
     async def _search_query_single(self, ctx: Context, query: str) -> VoiceEntry:
         loop = asyncio.get_event_loop()

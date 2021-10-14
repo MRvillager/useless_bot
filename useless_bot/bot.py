@@ -33,7 +33,7 @@ class UselessBot(commands.Bot):
                          description="a useless bot",
                          case_insensitive=True,
                          intents=Intents(guilds=True, guild_messages=True, reactions=True, members=True,
-                                         presences=True),
+                                         voice_states=True),
                          connector=self._conn,
                          loop=self.loop,
                          help_command=PrettyHelp())

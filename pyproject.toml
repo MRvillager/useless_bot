@@ -17,10 +17,11 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.9"
 discord-pretty-help = "*"
-aiorwlock = "^1"
+aiorwlock = "^1.1"
 aiohttp = { version = ">=3.7.4", extras = ["speedups"] }
 uvloop = { version = "*", markers = "sys_platform == 'linux'" }
 "py-cord" = { git = "https://github.com/Pycord-Development/pycord.git", extras = ["voice"] }
+youtube_dl = "^2021.6.6"
 
 orjson = { version = "^3", optional = true }
 aiofiles = { version = "^0.7", optional = true }

@@ -3,9 +3,9 @@ from __future__ import annotations
 import asyncio
 import logging
 
-from discord import Member, Guild, Role, Color
-from discord.ext import commands
-from discord.ext.commands import Bot, Context, group, check, CommandError
+from nextcord import Member, Guild, Role, Color
+from nextcord.ext import commands
+from nextcord.ext.commands import Bot, Context, group, check, CommandError
 
 from useless_bot.core.bank_core import BankCore
 from useless_bot.core.config import Config

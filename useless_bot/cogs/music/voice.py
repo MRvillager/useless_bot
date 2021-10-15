@@ -2,22 +2,22 @@ from __future__ import annotations
 
 import asyncio
 import logging
-
 from typing import Optional
-from discord import Bot, VoiceClient
 
+from nextcord import VoiceClient
+from nextcord.ext.commands import Bot
 
 from useless_bot.core.queue import SongQueue
 from .models import VoiceEntry
 
 __all__ = [
-    "VoiceState"
+    "PlayerState"
 ]
 
 logger = logging.getLogger("useless_bot.cogs.music.voice")
 
 
-class VoiceState:
+class PlayerState:
     def __init__(self, bot: Bot, voice: VoiceClient):
         self.bot = bot
 
@@ -47,7 +47,7 @@ class VoiceState:
         i = self._queue.index(item)
 
         if self.is_playing():
-            return i+1
+            return i + 1
         else:
             return i
 
@@ -80,7 +80,7 @@ class VoiceState:
             await self._queue.put(song)
 
     async def remove_from_queue(self, index: int):
-        del self._queue[index-1]
+        del self._queue[index - 1]
 
     def skip(self):
         self.skip_votes.clear()

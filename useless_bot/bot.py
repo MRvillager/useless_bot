@@ -4,10 +4,9 @@ from os import getenv
 from typing import Any
 
 import aiohttp
-from discord import Status, Game, Intents
-from discord.ext import commands
-from discord.ext.commands import check, errors, Context
-from pretty_help import PrettyHelp
+from nextcord import Status, Game, Intents
+from nextcord.ext import commands
+from nextcord.ext.commands import check, errors, Context
 
 from . import __version__, __author__, __title__
 from .cogs import system, settings, roles, reddit, doujin, bank, general, arcade, music
@@ -35,8 +34,7 @@ class UselessBot(commands.Bot):
                          intents=Intents(guilds=True, guild_messages=True, reactions=True, members=True,
                                          voice_states=True),
                          connector=self._conn,
-                         loop=self.loop,
-                         help_command=PrettyHelp())
+                         loop=self.loop)
 
         # set class variables
         self.debug = debug

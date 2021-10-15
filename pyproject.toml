@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "useless_bot"
-version = "2.2"
+version = "3.0"
 description = "self-hosted discord bot"
 license = "MIT"
 authors = ["MRvillager <mrvillager.dev@gmail.com>"]
@@ -16,12 +16,11 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
-discord-pretty-help = "*"
-aiorwlock = "^1.1"
-aiohttp = { version = ">=3.7.4", extras = ["speedups"] }
+youtube_dl = "*"
+aiorwlock = "^1"
+aiohttp = { version = "^3", extras = ["speedups"] }
 uvloop = { version = "*", markers = "sys_platform == 'linux'" }
-"py-cord" = { git = "https://github.com/Pycord-Development/pycord.git", extras = ["voice"] }
-youtube_dl = "^2021.6.6"
+nextcord = { version = "~2*", extras = ["voice", "speed"], allow-prereleases = true }
 
 orjson = { version = "^3", optional = true }
 aiofiles = { version = "^0.7", optional = true }

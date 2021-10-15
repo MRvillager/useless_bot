@@ -1,18 +1,18 @@
 import asyncio
 import logging
-import discord
-import youtube_dl
+from typing import Union
 
-from typing import Union, TYPE_CHECKING
-from discord import Bot, Embed, Color, Member
-from discord.ext import commands
-from discord.ext.commands import Context, has_permissions, bot_has_permissions, CommandError
+import nextcord
+import youtube_dl
+from nextcord import Embed, Color, Member, VoiceState
+from nextcord.ext import commands
+from nextcord.ext.commands import Context, has_permissions, CommandError, Bot
 
 from useless_bot.core.ytdl_options import ytdl_format_options, ffmpeg_options
 from useless_bot.utils import on_global_command_error, parse_seconds
 from .errors import *
-from .voice import VoiceState
 from .models import VoiceData, VoiceEntry, YTLink, YTLinkConverter, Playlist
+from .voice import PlayerState
 
 __all__ = [
     "Music"
@@ -26,7 +26,7 @@ class Music(commands.Cog):
 
     def __init__(self, discord_bot: Bot):
         self.bot = discord_bot
-        self.voice_states: dict[int, VoiceState] = {}
+        self.voice_states: dict[int, PlayerState] = {}
 
     async def cog_command_error(self, ctx: Context, error: CommandError) -> None:
         if isinstance(error, AuthorNotConnected):
@@ -59,18 +59,18 @@ class Music(commands.Cog):
                     if before.channel.members[0] == self.bot.user:
                         await member.guild.voice_client.disconnect(force=False)
 
-    def get_voice(self, ctx: Context) -> VoiceState:
+    def get_voice(self, ctx: Context) -> PlayerState:
         voice = self.voice_states.get(ctx.guild.id)
 
         if voice is None:
             # noinspection PyTypeChecker
-            voice = VoiceState(bot=self.bot, voice=ctx.voice_client)
+            voice = PlayerState(bot=self.bot, voice=ctx.voice_client)
             self.voice_states[ctx.guild.id] = voice
 
         return voice
 
     @staticmethod
-    async def playlist_embed(voice: VoiceState, result: Playlist) -> Embed:
+    async def playlist_embed(voice: PlayerState, result: Playlist) -> Embed:
         embed = Embed(color=Color.random(), type="link")
 
         embed.url = result.webpage_url
@@ -86,7 +86,7 @@ class Music(commands.Cog):
         return embed
 
     @staticmethod
-    async def song_embed(voice: VoiceState, result: VoiceEntry) -> Embed:
+    async def song_embed(voice: PlayerState, result: VoiceEntry) -> Embed:
         embed = Embed(color=Color.random(), type="link")
         data = result.data
 
@@ -176,7 +176,7 @@ class Music(commands.Cog):
         if author in voice_state.voice.channel.members:
             voice_state.skip_votes.add(author)
 
-        if len(voice_state.skip_votes) > (voice_state.voice.channel.member_count / 2):
+        if len(voice_state.skip_votes) > (voice_state.voice.channel.member_count // 2):
             voice_state.skip()
             await ctx.send("Skipped")
         else:
@@ -238,7 +238,7 @@ class Music(commands.Cog):
         songs = []
         for raw_song in data["entries"]:
             song_data = VoiceData.from_data(raw_song)
-            source = discord.FFmpegPCMAudio(song_data.url, **ffmpeg_options)
+            source = nextcord.FFmpegPCMAudio(song_data.url, **ffmpeg_options)
             song = VoiceEntry(source=source, data=song_data, author=author)
 
             songs.append(song)

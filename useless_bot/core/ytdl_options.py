@@ -24,11 +24,11 @@ ytdl_format_options = {
     "cachedir": "data/cache/",
     "cookiefile": "data/ytdl.cookies",
     "logger": logger,
-    "default_search": "ytsearch:"
+    # "default_search": "ytsearch:",
 }
 
 ffmpeg_options = {
-    "options": "-vn -filter:dynaudnorm",
+    "options": "-vn -filter:a loudnorm",
     "before_options": "-reconnect 1"
 }
 

@@ -9,6 +9,9 @@ class SongQueue(Queue):
     def _init(self, maxsize):
         self._queue = collections.deque()
 
+    def index(self, item) -> int:
+        return self._queue.index(item)
+
     def _get(self):
         if self.loop:
             self._queue.rotate(n=1)
@@ -21,7 +24,7 @@ class SongQueue(Queue):
     def to_list(self) -> list:
         return list(self._queue)
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: int):
         # TODO: improve this making it awaitable
         del self._queue[key]
 

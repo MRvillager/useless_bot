@@ -8,3 +8,7 @@ class AuthorNotConnected(Exception):
 
 class URLNotSupported(Exception):
     pass
+
+
+class PlaylistIsEmpty(Exception):
+    pass

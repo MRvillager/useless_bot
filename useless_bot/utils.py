@@ -3,7 +3,27 @@ import logging
 from discord.errors import Forbidden
 from discord.ext.commands import Context, errors
 
+
+__all__ = [
+    "parse_seconds",
+    "is_admin",
+    "set_up_logging"
+]
+
 base_logger = logging.getLogger("useless_bot")
+
+
+def parse_seconds(seconds: int) -> str:
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+
+    result = ""
+
+    if hours != 0:
+        result += f"{hours}:"
+
+    result += f"{minutes}:{seconds}"
+    return result
 
 
 async def is_admin(ctx: Context):

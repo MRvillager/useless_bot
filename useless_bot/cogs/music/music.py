@@ -4,15 +4,15 @@ import discord
 import youtube_dl
 
 from typing import Union, TYPE_CHECKING
-from discord import Bot
+from discord import Bot, Embed, Color, Member
 from discord.ext import commands
 from discord.ext.commands import Context, has_permissions, bot_has_permissions, CommandError
 
 from useless_bot.core.ytdl_options import ytdl_format_options, ffmpeg_options
-from useless_bot.utils import on_global_command_error
+from useless_bot.utils import on_global_command_error, parse_seconds
 from .errors import *
-from .voice import VoiceState, VoiceEntry, VoiceData
-from .yt import YTLink, YTLinkConverter
+from .voice import VoiceState
+from .models import VoiceData, VoiceEntry, YTLink, YTLinkConverter, Playlist
 
 __all__ = [
     "Music"
@@ -35,8 +35,29 @@ class Music(commands.Cog):
             await ctx.send("Cannot play this URL")
         elif isinstance(error, URLNotSupported):
             await ctx.send("This URL is not supported")
+        elif isinstance(error, PlaylistIsEmpty):
+            await ctx.send("This Playlist is empty")
+        elif isinstance(error, KeyError) or isinstance(error, IndexError):
+            await ctx.send("Parsing error")
+            logger.error(f"Parsing error occurred", exc_info=True)
         elif not await on_global_command_error(ctx, error):
             logger.error(f"Exception occurred", exc_info=True)
+
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member: Member, before: VoiceState, after: VoiceState):
+        if member == self.bot.user:
+            if after.channel is None:
+                try:
+                    voice_state = self.voice_states.pop(member.guild.id)
+                except KeyError:
+                    pass
+                else:
+                    del voice_state
+        elif after.channel is None and before.channel is not None:
+            if before.channel.guild.id in self.voice_states:
+                if len(before.channel.members) == 1:
+                    if before.channel.members[0] == self.bot.user:
+                        await member.guild.voice_client.disconnect(force=False)
 
     def get_voice(self, ctx: Context) -> VoiceState:
         voice = self.voice_states.get(ctx.guild.id)
@@ -48,41 +69,78 @@ class Music(commands.Cog):
 
         return voice
 
-    async def playlist_embed(self, ctx: Context, result: list[VoiceEntry]):
-        pass
+    @staticmethod
+    async def playlist_embed(voice: VoiceState, result: Playlist) -> Embed:
+        embed = Embed(color=Color.random(), type="link")
 
-    async def song_embed(self, ctx: Context, result: VoiceEntry):
-        pass
+        embed.url = result.webpage_url
+        embed.title = result.title
+        embed.description = f"Playlist requested by {result.requester.display_name}"
+        embed.set_author(name=result.uploader, url=result.uploader_url)
+        embed.set_thumbnail(url=result.thumbnail)
 
-    @commands.command(aliases=["p"])
+        embed.add_field(name="Position in queue", value=voice.index(result[0]))
+        embed.add_field(name="Playlist duration", value=parse_seconds(result.duration))
+        embed.add_field(name="Enqueued", value=len(result))
+
+        return embed
+
+    @staticmethod
+    async def song_embed(voice: VoiceState, result: VoiceEntry) -> Embed:
+        embed = Embed(color=Color.random(), type="link")
+        data = result.data
+
+        embed.url = data.webpage_url
+        embed.title = data.title
+        embed.set_author(name=data.uploader, url=data.uploader_url)
+        embed.set_thumbnail(url=data.thumbnail)
+
+        embed.add_field(name="Position in queue", value=voice.index(result))
+        if not data.is_live:
+            embed.description = f"Song requested by {result.requester.display_name}"
+            embed.add_field(name="Song duration", value=parse_seconds(data.duration))
+        else:
+            embed.description = f"Live requested by {result.requester.display_name}"
+
+        return embed
+
+    @commands.command(aliases=["p", "pp"])
     async def play(self, ctx: Context, *, query: Union[YTLinkConverter, str]):
+        embed: Embed
         voice = self.get_voice(ctx)
 
-        if type(query) is YTLink:
-            if TYPE_CHECKING:
-                # cast variable type to YTLink (for IDE)
-                query: YTLink
-
+        if isinstance(query, YTLink):  # if it's a supported link
             try:
-                result = await self.from_url(ctx, query)
+                result = await self.from_url(url=query, author=ctx.author)
             except NotFound:
                 await ctx.send("Cannot play this URL")
                 return
 
-            # send feedback to user
-            if len(result) > 1:
-                await self.playlist_embed(ctx, result)
+            if isinstance(result, Playlist):
+                # add songs to queue
+                await voice.add_to_queue(*result)
+                # create feedback for user
+                embed = await self.playlist_embed(voice, result)
             else:
-                await self.song_embed(ctx, result[0])
+                # add song to queue
+                await voice.add_to_queue(result)
+                # create feedback for user
+                embed = await self.song_embed(voice, result)
+        else:  # if it's not a supported link or it's a query
+            # search query and get the first entry
+            result = await self._search_single(query=query, author=ctx.author)
 
-            await voice.add_to_queue(*result)
-        else:
-            # TODO: search query
-            result = await self.search(query)
-            await self.song_embed(ctx, result)
+            # add song to queue
             await voice.add_to_queue(result)
 
+            # create feedback for user
+            embed = await self.song_embed(voice, result)
+
+        # start playing
         voice.play()
+
+        # send feedback to user
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=["repeat"])
     async def loop(self, ctx: Context):
@@ -128,8 +186,8 @@ class Music(commands.Cog):
     @has_permissions(manage_channels=True)
     async def quit(self, ctx: Context):
         # noinspection PyUnusedLocal
-        voice_state = self.voice_states.pop(ctx.guild.id)
-        del voice_state
+        await self.voice_states.get(ctx.guild.id).voice.disconnect()
+        await ctx.send("Successfully disconnected")
 
     @commands.command(aliases=["fs"])
     @has_permissions(manage_channels=True)
@@ -145,11 +203,11 @@ class Music(commands.Cog):
         if ctx.voice_client is None:
             if ctx.author.voice:
                 await ctx.author.voice.channel.connect()
+                await ctx.send(f"Now connected to {ctx.author.voice.channel.mention}")
             else:
                 raise AuthorNotConnected("Author not connected to a voice channel.")
 
     @commands.command()
-    @bot_has_permissions(speak=True, connect=True)
     async def connect(self, ctx: Context):
         await self._connect(ctx)
 
@@ -157,55 +215,51 @@ class Music(commands.Cog):
     @forceskip.before_invoke
     async def ensure_voice(self, ctx):
         if ctx.voice_client is None:
-            if ctx.author.voice:
+            if ctx.uploader.voice:
                 return True
             else:
                 await ctx.send("You are not connected to a voice channel.")
                 raise commands.CommandError("Author not connected to a voice channel.")
 
-    async def _search_query_multiple(self, ctx: Context, query: str) -> list[VoiceData]:
-        pass
-
-    async def _search_query_single(self, ctx: Context, query: str) -> VoiceEntry:
+    async def _get_results(self, query: str) -> dict:
         loop = asyncio.get_event_loop()
         data = await loop.run_in_executor(
             None,
             lambda: self.ytdl.extract_info(f"ytsearch:{query}", download=False, ie_key='YoutubeSearch'))
 
-        if not data['entries']:
+        if not data.get("entries"):
             raise NotFound
 
-        song_data = VoiceData.from_data(data['entries'][0])
-        source = discord.FFmpegPCMAudio(song_data.url, **ffmpeg_options)
-        song = VoiceEntry(source=source, data=song_data, author=ctx.author)
+        return data
 
-        return song
+    async def _search_multiple(self, author: Member, query: str) -> list[VoiceEntry]:
+        data = await self._get_results(query)
 
-    async def from_url(self, ctx: Context, url: YTLink) -> list[VoiceEntry]:
-        # TODO
+        songs = []
+        for raw_song in data["entries"]:
+            song_data = VoiceData.from_data(raw_song)
+            source = discord.FFmpegPCMAudio(song_data.url, **ffmpeg_options)
+            song = VoiceEntry(source=source, data=song_data, author=author)
+
+            songs.append(song)
+
+        return songs
+
+    async def _search_single(self, author: Member, query: str) -> VoiceEntry:
+        data = await self._get_results(query)
+
+        return VoiceEntry.from_data(data=data["entries"][0], author=author)
+
+    async def from_url(self, author: Member, url: YTLink) -> Union[VoiceEntry, Playlist]:
         loop = asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: self.ytdl.extract_info(url, download=False))
 
         if data is None:
             raise NotFound
 
-        if data.get("entries") is None:
-            if data.get("url") is None:
-                raise NotFound
-
-        result = []
         if data.get("url") is not None:
-            song_data = VoiceData.from_data(data)
-            source = discord.FFmpegPCMAudio(song_data.url, **ffmpeg_options)
-            song = VoiceEntry(source=source, data=song_data, author=ctx.author)
-
-            result.append(song)
+            return VoiceEntry.from_data(data=data, author=author)
+        elif data["_type"] == "playlist":
+            return Playlist.from_data(data=data, author=author)
         else:
-            for raw_song in data["entries"]:
-                song_data = VoiceData.from_data(raw_song)
-                source = discord.FFmpegPCMAudio(song_data.url, **ffmpeg_options)
-                song = VoiceEntry(source=source, data=song_data, author=ctx.author)
-
-                result.append(song)
-
-        return result
+            raise NotFound

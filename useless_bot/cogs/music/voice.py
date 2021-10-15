@@ -3,64 +3,18 @@ from __future__ import annotations
 import asyncio
 import logging
 
-from typing import Optional, Any
-from discord import Member, PCMVolumeTransformer, Bot, VoiceClient, FFmpegPCMAudio
+from typing import Optional
+from discord import Bot, VoiceClient
+
 
 from useless_bot.core.queue import SongQueue
+from .models import VoiceEntry
 
 __all__ = [
-    "VoiceData",
-    "VoiceEntry",
     "VoiceState"
 ]
 
-VOLUME = 0.5
-
 logger = logging.getLogger("useless_bot.cogs.music.voice")
-
-
-class VoiceData:
-    title: str
-    url: str
-    webpage_url: str
-    uploader: str
-    thumbnail: str
-    duration: str
-
-    uploader_url: Optional[str]
-    like_count: Optional[int]
-    dislike_count: Optional[int]
-    nsfw: Optional[bool]
-    is_live: Optional[bool]
-    views: Optional[int]
-    duration: Optional[int]
-
-    @classmethod
-    def from_data(cls, data: dict[str, Any]) -> VoiceData:
-        dataclass = cls()
-
-        dataclass.title = data.get("title")
-        dataclass.url = data["url"]
-        dataclass.webpage_url = data.get("webpage_url")
-        dataclass.uploader = data.get("uploader")
-        dataclass.uploader_url = data.get("uploader_url")
-        dataclass.thumbnail = data.get("thumbnail")
-        dataclass.like_count = data.get("like_count")
-        dataclass.dislike_count = data.get("dislike_count")
-        dataclass.nsfw = data.get("age_limit")
-        dataclass.is_live = data.get("is_live")
-        dataclass.duration = data.get("duration")
-        dataclass.views = data.get("view_count")
-
-        return dataclass
-
-
-class VoiceEntry(PCMVolumeTransformer):
-    def __init__(self, source: FFmpegPCMAudio, author: Member, data: VoiceData):
-        super().__init__(source, VOLUME)
-
-        self.requester = author
-        self.data = data
 
 
 class VoiceState:
@@ -78,7 +32,6 @@ class VoiceState:
     def __del__(self):
         try:
             self.audio_player.cancel()
-            self.bot.loop.call_soon_threadsafe(self.voice.disconnect)
             del self.voice
             del self._queue
             del self.current
@@ -86,6 +39,17 @@ class VoiceState:
             del self.skip_votes
         except AttributeError:
             pass
+
+    def index(self, item: VoiceEntry) -> int:
+        if item == self.current:
+            return 0
+
+        i = self._queue.index(item)
+
+        if self.is_playing():
+            return i+1
+        else:
+            return i
 
     def is_playing(self):
         return self.current is not None
@@ -116,7 +80,7 @@ class VoiceState:
             await self._queue.put(song)
 
     async def remove_from_queue(self, index: int):
-        del self._queue[index]
+        del self._queue[index-1]
 
     def skip(self):
         self.skip_votes.clear()

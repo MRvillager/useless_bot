@@ -176,7 +176,7 @@ class Music(commands.Cog):
         if author in voice_state.voice.channel.members:
             voice_state.skip_votes.add(author)
 
-        if len(voice_state.skip_votes) > (voice_state.voice.channel.member_count // 2):
+        if len(voice_state.skip_votes) > (len(voice_state.voice.channel.members) // 2):
             voice_state.skip()
             await ctx.send("Skipped")
         else:

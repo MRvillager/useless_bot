@@ -28,7 +28,7 @@ ytdl_format_options = {
 }
 
 ffmpeg_options = {
-    "options": "-filter:a loudnorm -vn",
+    "options": "-filter:a dynaudnorm -vn",
     "before_options": "-reconnect 1"
 }
 

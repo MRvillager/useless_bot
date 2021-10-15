@@ -106,6 +106,7 @@ class Music(commands.Cog):
 
     @commands.command(aliases=["p", "pp"])
     async def play(self, ctx: Context, *, query: Union[YTLinkConverter, str]):
+        """Play a song"""
         embed: Embed
         voice = self.get_voice(ctx)
 
@@ -144,6 +145,7 @@ class Music(commands.Cog):
 
     @commands.command(aliases=["repeat"])
     async def loop(self, ctx: Context):
+        """Toggle repeat"""
         voice = self.voice_states.get(ctx.guild.id)
 
         voice.loop = not voice.loop
@@ -155,6 +157,7 @@ class Music(commands.Cog):
 
     @commands.command()
     async def loopqueue(self, ctx: Context):
+        """Toggle loopqueue"""
         voice = self.voice_states.get(ctx.guild.id)
 
         voice.loopqueue = not voice.loopqueue
@@ -164,12 +167,9 @@ class Music(commands.Cog):
         else:
             await ctx.send("Disabled loop queue")
 
-    @commands.command()
-    async def search(self, ctx: Context, *, query: str):
-        raise NotImplemented
-
     @commands.command(aliases=["s"])
     async def skip(self, ctx: Context):
+        """Vote for skipping a song"""
         author = ctx.author
         voice_state = self.get_voice(ctx)
 
@@ -185,6 +185,7 @@ class Music(commands.Cog):
     @commands.command(aliases=["fuckoff"])
     @has_permissions(manage_channels=True)
     async def quit(self, ctx: Context):
+        """Disconnect bot from channel"""
         # noinspection PyUnusedLocal
         await self.voice_states.get(ctx.guild.id).voice.disconnect()
         await ctx.send("Successfully disconnected")

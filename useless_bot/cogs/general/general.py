@@ -1,8 +1,8 @@
 import logging
 
-from nextcord import Member, TextChannel
-from nextcord.ext import commands
-from nextcord.ext.commands import Bot, Context, CommandError, has_permissions, bot_has_permissions
+from discord import Member, TextChannel
+from discord.ext import commands
+from discord.ext.commands import Bot, Context, CommandError, has_permissions, bot_has_permissions
 
 from useless_bot.core.config import Config
 from useless_bot.utils import on_global_command_error

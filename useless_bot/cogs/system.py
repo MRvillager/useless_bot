@@ -1,9 +1,9 @@
 import logging
 from platform import uname, python_compiler, python_implementation, python_version
 
-from nextcord import Embed
-from nextcord.ext import commands
-from nextcord.ext.commands import Bot, Context, is_owner, CommandError, check
+from discord import Embed
+from discord.ext import commands
+from discord.ext.commands import Bot, Context, is_owner, CommandError, check
 
 from useless_bot.utils import is_admin, on_global_command_error
 

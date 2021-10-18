@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from typing import Any, Optional
 
 from aiorwlock import RWLock
-from nextcord import Guild
+from discord import Guild
 
 from .drivers import Base, KeysSet, Shelve
 

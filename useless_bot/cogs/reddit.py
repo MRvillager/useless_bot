@@ -4,9 +4,9 @@ from string import ascii_lowercase, digits
 from typing import List, Iterable
 
 from aiohttp.web_exceptions import HTTPException
-from nextcord import Embed
-from nextcord.ext import commands
-from nextcord.ext.commands import Bot, Context, is_nsfw, CommandError
+from discord import Embed
+from discord.ext import commands
+from discord.ext.commands import Bot, Context, is_nsfw, CommandError
 
 from useless_bot.core.config import Config
 from useless_bot.core.reddit_api import RedditAPI, Post, Forbidden

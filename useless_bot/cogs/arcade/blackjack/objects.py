@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum, auto
 from typing import Iterable, Type, Union
 
-from nextcord import Member, User
+from discord import Member, User
 
 
 class Status(Enum):
@@ -84,7 +84,7 @@ class Player:
 
     @classmethod
     def from_discord(cls: Type[Player], member: Union[User, Member]) -> Player:
-        """Create a player object using a nextcord member object"""
+        """Create a player object using a discord member object"""
         return cls(name=member.name)
 
 

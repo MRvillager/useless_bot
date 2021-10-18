@@ -20,10 +20,11 @@ youtube_dl = "*"
 aiorwlock = "^1"
 aiohttp = { version = "^3", extras = ["speedups"] }
 uvloop = { version = "*", markers = "sys_platform == 'linux'" }
-nextcord = { version = "~2*", extras = ["voice", "speed"], allow-prereleases = true }
+"discord.py" = {url = "https://github.com/MRvillager/discord.py/archive/refs/heads/master.zip", extras = ["voice"]}
 
 orjson = { version = "^3", optional = true }
 aiofiles = { version = "^0.7", optional = true }
+
 
 [tool.poetry.extras]
 json = ["orjson", "aiofiles"]

@@ -1,8 +1,8 @@
 import logging
 from typing import Optional
 
-from nextcord.ext import commands
-from nextcord.ext.commands import group, Context, CommandError
+from discord.ext import commands
+from discord.ext.commands import group, Context, CommandError
 
 from useless_bot.utils import on_global_command_error
 from .bank import Bank

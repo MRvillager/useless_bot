@@ -3,10 +3,10 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Optional, Any
 
-import nextcord
-from nextcord import PCMVolumeTransformer, FFmpegPCMAudio, Member
-from nextcord.ext import commands
-from nextcord.ext.commands import Context
+import discord
+from discord import PCMVolumeTransformer, FFmpegPCMAudio, Member
+from discord.ext import commands
+from discord.ext.commands import Context
 from youtube_dl import extractor
 
 from useless_bot.core.ytdl_options import ffmpeg_options
@@ -70,7 +70,7 @@ class VoiceEntry(PCMVolumeTransformer):
     @classmethod
     def from_data(cls, data: dict, author: Member) -> VoiceEntry:
         song_data = VoiceData.from_data(data)
-        source = nextcord.FFmpegPCMAudio(song_data.url, **ffmpeg_options)
+        source = discord.FFmpegPCMAudio(song_data.url, **ffmpeg_options)
         return cls(source=source, data=song_data, author=author)
 
 
@@ -106,7 +106,7 @@ class Playlist(list):
             if song_data.duration:
                 result.duration += song_data.duration
 
-            source = nextcord.FFmpegPCMAudio(song_data.url, **ffmpeg_options)
+            source = discord.FFmpegPCMAudio(song_data.url, **ffmpeg_options)
             song = VoiceEntry(source=source, data=song_data, author=author)
 
             result.append(song)

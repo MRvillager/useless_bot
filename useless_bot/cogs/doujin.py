@@ -2,9 +2,9 @@ import logging
 import re
 
 import aiohttp
-from nextcord import Embed
-from nextcord.ext import commands
-from nextcord.ext.commands import Bot, is_nsfw, Context, CommandError
+from discord import Embed
+from discord.ext import commands
+from discord.ext.commands import Bot, is_nsfw, Context, CommandError
 
 from useless_bot.utils import on_global_command_error
 

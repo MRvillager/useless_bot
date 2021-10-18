@@ -1,7 +1,7 @@
 # useless_bot
 
 A personal bot for Discord using [discord.py](https://github.com/MRvillager/discord.py). \
-This is a cls-hosted bot, so you will need to host and maintain your own instance.
+This is a self-hosted bot, so you will need to host and maintain your own instance.
 
 ## Features
 

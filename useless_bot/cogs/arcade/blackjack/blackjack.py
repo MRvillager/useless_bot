@@ -2,9 +2,9 @@ import logging
 from random import shuffle
 from typing import Union, Optional
 
-from discord import ButtonStyle, Interaction, Message, Embed, Member, User
-from discord.ext.commands import Context
-from discord.ui import Button, View
+from nextcord import ButtonStyle, Interaction, Message, Embed, Member, User
+from nextcord.ext.commands import Context
+from nextcord.ui import Button, View
 
 from useless_bot.core.bank_core import BankCore
 from useless_bot.core.errors import BalanceOverLimitError, BalanceUnderLimitError

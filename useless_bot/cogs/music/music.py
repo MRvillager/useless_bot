@@ -2,11 +2,11 @@ import asyncio
 import logging
 from typing import Union
 
-import discord
+import nextcord
 import youtube_dl
-from discord import Embed, Color, Member, VoiceState
-from discord.ext import commands
-from discord.ext.commands import Context, has_permissions, CommandError, Bot
+from nextcord import Embed, Color, Member, VoiceState
+from nextcord.ext import commands
+from nextcord.ext.commands import Context, has_permissions, CommandError, Bot
 
 from useless_bot.core.ytdl_options import ytdl_format_options, ffmpeg_options
 from useless_bot.utils import on_global_command_error, parse_seconds
@@ -239,7 +239,7 @@ class Music(commands.Cog):
         songs = []
         for raw_song in data["entries"]:
             song_data = VoiceData.from_data(raw_song)
-            source = discord.FFmpegPCMAudio(song_data.url, **ffmpeg_options)
+            source = nextcord.FFmpegPCMAudio(song_data.url, **ffmpeg_options)
             song = VoiceEntry(source=source, data=song_data, author=author)
 
             songs.append(song)

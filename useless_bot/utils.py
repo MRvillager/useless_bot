@@ -1,7 +1,7 @@
 import logging
 
-from discord.errors import Forbidden
-from discord.ext.commands import Context, errors
+from nextcord.errors import Forbidden
+from nextcord.ext.commands import Context, errors
 
 __all__ = [
     "parse_seconds",
@@ -34,7 +34,7 @@ async def is_admin(ctx: Context):
 def set_up_logging():
     # Get loggers
     root_logger = logging.getLogger()
-    dpy_logger = logging.getLogger("discord")
+    dpy_logger = logging.getLogger("nextcord")
     aiohttp_logger = logging.getLogger('aiohttp.client')
     ydl_logger = logging.getLogger('youtube_dl')
 

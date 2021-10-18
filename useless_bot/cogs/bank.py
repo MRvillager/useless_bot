@@ -2,11 +2,11 @@ import logging
 from time import time
 from typing import Union, Optional
 
-import discord
-from discord import Embed
-from discord.ext import commands
-from discord.ext.commands import Bot, group, Context, CommandError
-from discord.utils import get
+import nextcord
+from nextcord import Embed
+from nextcord.ext import commands
+from nextcord.ext.commands import Bot, group, Context, CommandError
+from nextcord.utils import get
 
 from useless_bot.core.bank_core import BankCore
 from useless_bot.core.config import Config
@@ -53,7 +53,7 @@ class Bank(commands.Cog, name="Bank"):
         return f"You need to wait {seconds} seconds"
 
     @group(invoke_without_command=True, usage="")
-    async def bank(self, ctx: Context, user: Optional[Union[discord.User, discord.Member]] = None):
+    async def bank(self, ctx: Context, user: Optional[Union[nextcord.User, nextcord.Member]] = None):
         """Get your bank page"""
         if user is not None and ctx.author.guild_permissions.administrator:
             pass
@@ -97,14 +97,14 @@ class Bank(commands.Cog, name="Bank"):
 
     @commands.is_owner()
     @bank.command()
-    async def add(self, ctx: Context, user: Union[discord.User, discord.Member], value: int):
+    async def add(self, ctx: Context, user: Union[nextcord.User, nextcord.Member], value: int):
         """Add some bank to a user. WARNING: this will cause inflation"""
         await self._bank.deposit(user=user, value=value)
         await ctx.send(f"Added {value} credits to {user.mention}")
 
     @commands.is_owner()
     @bank.command()
-    async def remove(self, ctx: Context, user: Union[discord.User, discord.Member], value: int):
+    async def remove(self, ctx: Context, user: Union[nextcord.User, nextcord.Member], value: int):
         """Remove bank from a user. WARNING: this will cause inflation"""
         await self._bank.withdraw(user=user, value=value)
         await ctx.send(f"Removed {value} credits from {user.mention}")
@@ -128,7 +128,7 @@ class Bank(commands.Cog, name="Bank"):
         await ctx.send("Cleared database")
 
     @bank.command()
-    async def move(self, ctx: Context, user: Union[discord.User, discord.Member], value: int):
+    async def move(self, ctx: Context, user: Union[nextcord.User, nextcord.Member], value: int):
         value = abs(value)  # prevent bank stealing
         await self._bank.move(from_user=ctx.author, to_user=user, value=value)
         await ctx.send(f"Moved {value} credits to {user.mention}")

@@ -4,8 +4,8 @@ import asyncio
 import logging
 from typing import Optional
 
-from discord import VoiceClient
-from discord.ext.commands import Bot
+from nextcord import VoiceClient
+from nextcord.ext.commands import Bot
 
 from useless_bot.core.queue import SongQueue
 from .models import VoiceEntry

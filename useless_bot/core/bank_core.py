@@ -4,7 +4,7 @@ import logging
 from dataclasses import dataclass, asdict
 from typing import Union, Final, AsyncIterator
 
-from discord import User, Member
+from nextcord import User, Member
 
 from .config import Config
 from .errors import BalanceOverLimitError, BalanceUnderLimitError

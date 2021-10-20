@@ -10,10 +10,6 @@ with open('README.md') as f:
 with open('useless_bot/__init__.py') as f:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
 
-extras_require = {
-    'voice': ['PyNaCl>=1.3.0,<1.5'],
-}
-
 setup(
     name='useless_bot',
     version=version,
@@ -26,19 +22,12 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     install_requires=requirements,
-    extras_require=extras_require,
-    python_requires='>=3.9.0',
-    entry_points={
-        'console_scripts': [
-            'create_db = useless-bot.scripts.create_db:main',
-        ]
-    },
+    python_requires='>=3.9.0,<3.10',
     classifiers=[
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
         'Topic :: Internet',
         'Topic :: Utilities',
     ]

@@ -87,3 +87,4 @@ data/config.json
 data/*.sqlite
 
 data/
+logs/

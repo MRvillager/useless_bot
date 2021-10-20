@@ -37,6 +37,8 @@ class Music(commands.Cog):
             await ctx.send("This URL is not supported")
         elif isinstance(error, PlaylistIsEmpty):
             await ctx.send("This Playlist is empty")
+        elif isinstance(error, VoiceNotTheSame):
+            await ctx.send("I'm already in a channel. You must connect to it to give me orders")
         elif isinstance(error, KeyError) or isinstance(error, IndexError):
             await ctx.send("Parsing error")
             logger.error(f"Parsing error occurred", exc_info=True)
@@ -53,10 +55,12 @@ class Music(commands.Cog):
                     pass
                 else:
                     del voice_state
-        elif after.channel is None and before.channel is not None:
+        elif before.channel is not None:
             if before.channel.guild.id in self.voice_states:
                 if len(before.channel.members) == 1:
-                    if before.channel.members[0] == self.bot.user:
+                    if after.channel is not None:
+                        await member.guild.voice_client.move_to(after.channel)
+                    elif before.channel.members[0] == self.bot.user and after.channel:
                         await member.guild.voice_client.disconnect(force=False)
 
     def get_voice(self, ctx: Context) -> PlayerState:
@@ -204,9 +208,12 @@ class Music(commands.Cog):
         if ctx.voice_client is None:
             if ctx.author.voice:
                 await ctx.author.voice.channel.connect()
+                self.get_voice(ctx)
                 await ctx.send(f"Now connected to {ctx.author.voice.channel.mention}")
             else:
                 raise AuthorNotConnected("Author not connected to a voice channel.")
+        elif ctx.author.voice.channel != ctx.voice_client.channel and not self.bot.is_owner(ctx.author):
+            raise VoiceNotTheSame("Author not connected to the same voice channel")
 
     @commands.command()
     async def connect(self, ctx: Context):
@@ -221,6 +228,8 @@ class Music(commands.Cog):
             else:
                 await ctx.send("You are not connected to a voice channel.")
                 raise commands.CommandError("Author not connected to a voice channel.")
+        elif ctx.author.voice.channel != ctx.voice_client.channel and not self.bot.is_owner(ctx.author):
+            raise VoiceNotTheSame("Author not connected to the same voice channel")
 
     async def _get_results(self, query: str) -> dict:
         loop = asyncio.get_event_loop()

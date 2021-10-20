@@ -23,7 +23,7 @@ class UselessBot(commands.Bot):
             "User-Agent": useragent
         }
         self.loop = get_event_loop()
-        self._conn = aiohttp.TCPConnector(ttl_dns_cache=6817, limit=100, loop=self.loop)
+        self._conn = aiohttp.TCPConnector(ttl_dns_cache=600, limit=100, loop=self.loop)
         self._session = aiohttp.ClientSession(connector=self._conn, headers=headers, loop=self.loop,
                                               connector_owner=False)
 
@@ -66,7 +66,7 @@ class UselessBot(commands.Bot):
         if self.debug:
             await self.change_presence(status=Status.do_not_disturb, activity=Game(name="Testing new release"))
         else:
-            await self.change_presence(activity=Game(name="Overwatch 3"))
+            await self.change_presence(activity=Game(name="Overwatch 2"))
 
     @check
     async def globally_block_dms(self, ctx: commands.Context) -> bool:
@@ -105,7 +105,7 @@ class UselessBot(commands.Bot):
         logger.info("Bot closed")
 
     async def on_error(self, event_method: str, *args: Any, **kwargs: Any):
-        logging.error(f"Ignoring exception in {event_method}", exc_info=True)
+        logger.error(f"Ignoring exception in {event_method}", exc_info=True)
 
     async def on_command_error(self, context: Context, exception: errors.CommandError):
         if self.extra_events.get("on_command_error", None):
@@ -119,4 +119,4 @@ class UselessBot(commands.Bot):
         if cog and cog.has_error_handler():
             return
 
-        logging.error(f"Ignoring exception in command {context.command}", exc_info=True)
+        logger.error(f"Ignoring exception in command {context.command}", exc_info=True)

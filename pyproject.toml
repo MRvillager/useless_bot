@@ -15,14 +15,14 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "~3.9"
 youtube_dl = "*"
 aiorwlock = "^1"
 aiohttp = { version = "^3", extras = ["speedups"] }
 uvloop = { version = "*", markers = "sys_platform == 'linux'" }
-nextcord = { version = "~2*", extras = ["voice", "speed"], allow-prereleases = true }
+nextcord = { version = "~2*", extras = ["voice"], allow-prereleases = true}
 
-orjson = { version = "^3", optional = true }
+orjson = { version = "^3", markers = "platform_machine != 'armv7l'"}
 aiofiles = { version = "^0.7", optional = true }
 
 [tool.poetry.extras]

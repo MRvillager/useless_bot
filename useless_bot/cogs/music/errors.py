@@ -12,3 +12,7 @@ class URLNotSupported(Exception):
 
 class PlaylistIsEmpty(Exception):
     pass
+
+
+class VoiceNotTheSame(Exception):
+    pass

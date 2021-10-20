@@ -4,7 +4,6 @@ from asyncio import Queue
 
 class SongQueue(Queue):
     loop: bool = False
-    repeat: bool = False
 
     def _init(self, maxsize):
         self._queue = collections.deque()
@@ -15,8 +14,6 @@ class SongQueue(Queue):
     def _get(self):
         if self.loop:
             self._queue.rotate(n=1)
-
-        if self.repeat or self.loop:
             return self._queue[0]
 
         return self._queue.popleft()

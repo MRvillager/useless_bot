@@ -24,6 +24,8 @@ class PlayerState:
         self.voice: VoiceClient = voice
         self.current: Optional[VoiceEntry] = None
 
+        self.loop = False
+
         self._play_next_song = asyncio.Event()
         self._queue = SongQueue()
         self.skip_votes = set()  # a set of user_ids that voted
@@ -58,14 +60,6 @@ class PlayerState:
         queue = self._queue.to_list()
 
         return queue
-
-    @property
-    def loop(self) -> bool:
-        return self._queue.repeat
-
-    @loop.setter
-    def loop(self, value: bool):
-        self._queue.repeat = value
 
     @property
     def loopqueue(self) -> bool:
@@ -107,6 +101,9 @@ class PlayerState:
         while True:
             await self._play_next_song.wait()
 
-            self.current = await self._queue.get()
+            if self.current is None or not self.loop:
+                self.current = await self._queue.get()
+
             self.voice.play(self.current, after=self._play)
-            self._play_next_song.clear()
+
+            self.bot.loop.call_soon_threadsafe(self._play_next_song.clear)

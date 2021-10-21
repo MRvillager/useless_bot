@@ -5,7 +5,9 @@ from os import getenv
 from .bot import UselessBot
 from .utils import set_up_logging
 
-set_up_logging()
+
+debug = bool(int(getenv("DEBUG", 0)))
+set_up_logging(debug=debug)
 logger = logging.getLogger("useless_bot")
 
 logger.info("Initializing Bot")
@@ -44,8 +46,8 @@ else:
 
 if __name__ == "__main__":
     # initialize bot
-    debug = int(getenv("DEBUG", 0))
-    bot = UselessBot(debug=bool(debug))
+
+    bot = UselessBot(debug=debug)
 
     logger.debug("Bot initialization complete")
 

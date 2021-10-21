@@ -1,4 +1,5 @@
 import logging
+from logging.handlers import TimedRotatingFileHandler
 
 from nextcord.errors import Forbidden
 from nextcord.ext.commands import Context, errors
@@ -31,7 +32,7 @@ async def is_admin(ctx: Context):
     return ctx.author.guild_permissions.administrator
 
 
-def set_up_logging():
+def set_up_logging(debug: bool = False):
     # Get loggers
     root_logger = logging.getLogger()
     dpy_logger = logging.getLogger("nextcord")
@@ -44,17 +45,27 @@ def set_up_logging():
     aiohttp_logger.setLevel(logging.WARNING)
     ydl_logger.setLevel(logging.CRITICAL)
 
-    # Create handler
+    # Clean-up handler
+    if root_logger.hasHandlers():
+        root_logger.handlers.clear()
+
+    # Create stream handler
     stdout_handler = logging.StreamHandler()
     stdout_formatter = logging.Formatter(
         "[{asctime}] [{levelname}] {name}.{funcName}: {message}", datefmt="%Y-%m-%d %H:%M:%S", style='{'
     )
     stdout_handler.setFormatter(stdout_formatter)
-
-    # Set handler
-    if root_logger.hasHandlers():
-        root_logger.handlers.clear()
+    # Add handler
     root_logger.addHandler(stdout_handler)
+
+    if debug:
+        # Create timed file handler
+        file_handler = logging.handlers.TimedRotatingFileHandler("logs/useless_bot.log", when="midnight")
+        file_handler.setFormatter(stdout_formatter)
+        # Set logging level
+        file_handler.setLevel(logging.DEBUG)
+        # Add handler
+        root_logger.addHandler(file_handler)
 
 
 async def on_global_command_error(ctx: Context, error: errors.CommandError) -> bool:

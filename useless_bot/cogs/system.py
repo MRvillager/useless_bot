@@ -1,7 +1,7 @@
 import logging
 from platform import uname, python_compiler, python_implementation, python_version
 
-from nextcord import Embed
+from nextcord import Embed, File
 from nextcord.ext import commands
 from nextcord.ext.commands import Bot, Context, is_owner, CommandError, check
 
@@ -25,6 +25,12 @@ class System(commands.Cog):
     async def shutdown(self, _: Context):
         """Shutdown the bot"""
         await self.bot.close()
+
+    @is_owner()
+    @commands.command(hidden=True)
+    async def logs(self, ctx: Context):
+        """Shutdown the bot"""
+        await ctx.send(file=File("logs/useless_bot.log"))
 
     @check(is_admin)
     @commands.command()

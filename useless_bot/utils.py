@@ -35,28 +35,28 @@ async def is_admin(ctx: Context):
 def set_up_logging(debug: bool = False):
     # Get loggers
     root_logger = logging.getLogger()
-    dpy_logger = logging.getLogger("nextcord")
-    aiohttp_logger = logging.getLogger('aiohttp.client')
-    ydl_logger = logging.getLogger('youtube_dl')
+    loggers: list[logging.Logger] = [
+        base_logger,
+        logging.getLogger("nextcord"),
+        logging.getLogger('aiohttp.client'),
+        logging.getLogger('youtube_dl')
+    ]
+
+    handlers: list[logging.Handler] = []
 
     # Set logging levels
-    base_logger.setLevel(logging.INFO)
-    dpy_logger.setLevel(logging.WARNING)
-    aiohttp_logger.setLevel(logging.WARNING)
-    ydl_logger.setLevel(logging.CRITICAL)
-
-    # Clean-up handler
-    if root_logger.hasHandlers():
-        root_logger.handlers.clear()
+    root_logger.setLevel(logging.DEBUG)
+    root_logger.handlers.clear()
 
     # Create stream handler
     stdout_handler = logging.StreamHandler()
     stdout_formatter = logging.Formatter(
-        "[{asctime}] [{levelname}] {name}.{funcName}: {message}", datefmt="%Y-%m-%d %H:%M:%S", style='{'
+        "[{asctime}] [{levelname}] {name}.{funcName}: {message}", datefmt="%H:%M:%S %d-%m-%Y", style='{'
     )
+    stdout_handler.setLevel(logging.INFO)
     stdout_handler.setFormatter(stdout_formatter)
     # Add handler
-    root_logger.addHandler(stdout_handler)
+    handlers.append(stdout_handler)
 
     if debug:
         # Create timed file handler
@@ -65,7 +65,15 @@ def set_up_logging(debug: bool = False):
         # Set logging level
         file_handler.setLevel(logging.DEBUG)
         # Add handler
-        root_logger.addHandler(file_handler)
+        handlers.append(file_handler)
+
+    for logger in loggers:
+        # remove already set up handlers from logger
+        logger.handlers.clear()
+
+        for handler in handlers:
+            # add handlers
+            logger.addHandler(handler)
 
 
 async def on_global_command_error(ctx: Context, error: errors.CommandError) -> bool:

@@ -245,6 +245,9 @@ class Music(commands.Cog):
     async def _search_multiple(self, author: Member, query: str) -> list[VoiceEntry]:
         data = await self._get_results(query)
 
+        if data is None:
+            raise NotFound
+
         songs = []
         for raw_song in data["entries"]:
             song_data = VoiceData.from_data(raw_song)
@@ -257,6 +260,9 @@ class Music(commands.Cog):
 
     async def _search_single(self, author: Member, query: str) -> VoiceEntry:
         data = await self._get_results(query)
+
+        if data is None:
+            raise NotFound
 
         return VoiceEntry.from_data(data=data["entries"][0], author=author)
 

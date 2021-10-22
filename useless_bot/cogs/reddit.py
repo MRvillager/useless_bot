@@ -69,21 +69,24 @@ class Reddit(commands.Cog):
             await ctx.send(embed=self.create_embed(post))
 
     @is_nsfw()
-    @commands.command(usage="[subreddits...]")
+    @commands.command(usage="[subreddits...]", aliases=["sauce"])
     async def nsfw(self, ctx: Context, subreddits: commands.Greedy[Subreddit] = None):
         """Get NSFW post from Reddit"""
         if subreddits:
             post = await self.get_post_from_subreddit(subreddits)
         else:
             if len(self.nsfw_cache) == 0:
-                logger.info(f"Refreshing nsfw submissions cache")
-                subreddits = await self.config.get(["nsfw_subreddits"])
-                self.nsfw_cache = await self.reddit.hot(subreddits)
-                logger.info(f"Refresh complete")
+                await self.refresh_nsfw()
 
             post = self.nsfw_cache.pop(randint(0, len(self.nsfw_cache) - 1))
 
         await ctx.send(embed=self.create_embed(post))
+
+    async def refresh_nsfw(self):
+        logger.info(f"Refreshing nsfw submissions cache")
+        subreddits = await self.config.get(["nsfw_subreddits"])
+        self.nsfw_cache = await self.reddit.hot(subreddits)
+        logger.info(f"Refresh complete")
 
     @commands.command(usage="[subreddits...]")
     async def meme(self, ctx: Context, subreddits: commands.Greedy[Subreddit] = None):
@@ -96,14 +99,17 @@ class Reddit(commands.Cog):
                 return
         else:
             if len(self.meme_cache) == 0:
-                logger.info(f"Refreshing meme submissions cache")
-                subreddits = await self.config.get(["subreddits"])
-                self.meme_cache = await self.reddit.hot(subreddits)
-                logger.info(f"Refresh complete")
+                await self.refresh_meme()
 
             post = self.meme_cache.pop(randint(0, len(self.meme_cache) - 1))
 
         await ctx.send(embed=self.create_embed(post))
+
+    async def refresh_meme(self):
+        logger.info(f"Refreshing meme submissions cache")
+        subreddits = await self.config.get(["subreddits"])
+        self.meme_cache = await self.reddit.hot(subreddits)
+        logger.info(f"Refresh complete")
 
     async def change_meme_source(self, subreddits: List[str]):
         # parse subreddits and save them

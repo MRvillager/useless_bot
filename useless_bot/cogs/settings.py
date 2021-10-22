@@ -94,6 +94,7 @@ class Settings(commands.Cog):
 
         if len(subreddits) != 0:
             await self.reddit_cog.config.set(["nsfw_subreddits"], "+".join(subreddits))
+            await self.reddit_cog.refresh_nsfw()
 
         current = await self.reddit_cog.config.get(["nsfw_subreddits"])
         current = current.split('+')
@@ -107,6 +108,7 @@ class Settings(commands.Cog):
 
         if len(subreddits) != 0:
             await self.reddit_cog.config.set(["subreddits"], "+".join(subreddits))
+            await self.reddit_cog.refresh_meme()
 
         current = await self.reddit_cog.config.get(["subreddits"])
         current = current.split('+')

@@ -237,6 +237,9 @@ class Music(commands.Cog):
             None,
             lambda: self.ytdl.extract_info(f"ytsearch:{query}", download=False, ie_key='YoutubeSearch'))
 
+        if data is None:
+            raise NotFound
+
         if not data.get("entries"):
             raise NotFound
 
@@ -244,9 +247,6 @@ class Music(commands.Cog):
 
     async def _search_multiple(self, author: Member, query: str) -> list[VoiceEntry]:
         data = await self._get_results(query)
-
-        if data is None:
-            raise NotFound
 
         songs = []
         for raw_song in data["entries"]:
@@ -260,9 +260,6 @@ class Music(commands.Cog):
 
     async def _search_single(self, author: Member, query: str) -> VoiceEntry:
         data = await self._get_results(query)
-
-        if data is None:
-            raise NotFound
 
         return VoiceEntry.from_data(data=data["entries"][0], author=author)
 

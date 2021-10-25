@@ -5,7 +5,7 @@ import nextcord
 from nextcord import InviteTarget, Embed, Color, ButtonStyle
 from nextcord.ext.commands import Bot, Cog, command, Context, CommandError
 
-from cogs.music.errors import AuthorNotConnected
+from useless_bot.cogs.music.errors import AuthorNotConnected
 from useless_bot.utils import on_global_command_error
 
 

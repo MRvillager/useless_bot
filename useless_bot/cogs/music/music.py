@@ -14,9 +14,7 @@ from .errors import *
 from .models import VoiceData, VoiceEntry, YTLink, YTLinkConverter, Playlist
 from .voice import PlayerState
 
-__all__ = [
-    "Music"
-]
+__all__ = ["Music"]
 
 logger = logging.getLogger("useless_bot.cogs.music.music")
 

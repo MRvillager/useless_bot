@@ -1,15 +1,17 @@
 import logging
+from typing import Optional
 
 from nextcord import Member, TextChannel
 from nextcord.ext import commands
-from nextcord.ext.commands import Bot, Context, CommandError, has_permissions, bot_has_permissions
+from nextcord.ext.commands import Bot, Context, CommandError, has_permissions, bot_has_permissions, check
 
 from useless_bot.core.config import Config
-from useless_bot.utils import on_global_command_error
+from useless_bot.utils import on_global_command_error, is_admin
 from .views import WarnLimit
 
-logger = logging.getLogger("useless_bot.cog.general")
+__all__ = ["General"]
 
+logger = logging.getLogger("useless_bot.cog.general")
 schema = {
     "leave_msg": "{mention} has left the server",
     "warn": {
@@ -90,3 +92,10 @@ class General(commands.Cog):
             await ctx.send(f"Yeah we already know")
         else:
             await ctx.send(f"{message}")
+
+    @check(is_admin)
+    @commands.command()
+    async def delete(self, ctx: Context, message_id: Optional[int] = None):
+        """Delete a message"""
+        if message_id is None:
+            ctx.re

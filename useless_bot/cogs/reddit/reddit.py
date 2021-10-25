@@ -12,8 +12,9 @@ from useless_bot.core.config import Config
 from useless_bot.core.reddit_api import RedditAPI, Post, Forbidden
 from useless_bot.utils import on_global_command_error
 
-logger = logging.getLogger("useless_bot.cog.reddit")
+__all__ = ["Reddit"]
 
+logger = logging.getLogger("useless_bot.cog.reddit")
 schema = {
     "subreddits": "memes+dankmemes",
     "nsfw_subreddits": "hornyjail"

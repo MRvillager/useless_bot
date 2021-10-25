@@ -9,8 +9,9 @@ from useless_bot.core.config import Config
 from useless_bot.utils import on_global_command_error
 from .blackjack import Blackjack
 
-logger = logging.getLogger("useless_bot.cog.arcade")
+__all__ = ["Arcade"]
 
+logger = logging.getLogger("useless_bot.cog.arcade")
 schema = {"blackjack": 5}
 
 

@@ -1,8 +1,8 @@
 import logging
+import nextcord
+
 from time import time
 from typing import Union, Optional
-
-import nextcord
 from nextcord import Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Bot, group, Context, CommandError
@@ -15,6 +15,8 @@ from useless_bot.utils import on_global_command_error
 
 schema = {"free_credits": 15}
 logger = logging.getLogger("useless_bot.cog.bank")
+
+__all__ = ["Bank"]
 
 
 class Bank(commands.Cog, name="Bank"):

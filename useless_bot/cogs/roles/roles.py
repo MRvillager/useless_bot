@@ -12,8 +12,9 @@ from useless_bot.core.config import Config
 from useless_bot.core.errors import BalanceUnderLimitError, BalanceOverLimitError
 from useless_bot.utils import is_admin, on_global_command_error
 
-schema = {"create_role_price": 75}
+__all__ = ["Roles"]
 
+schema = {"create_role_price": 75}
 logger = logging.getLogger("useless_bot.cog.roles")
 
 

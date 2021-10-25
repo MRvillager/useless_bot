@@ -7,6 +7,8 @@ from nextcord.ext.commands import Bot, Context, is_owner, CommandError, check
 
 from useless_bot.utils import is_admin, on_global_command_error
 
+__all__ = ["System"]
+
 logger = logging.getLogger("useless_bot.cog.system")
 
 

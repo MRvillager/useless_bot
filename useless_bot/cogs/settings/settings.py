@@ -5,10 +5,12 @@ from nextcord.ext import commands
 from nextcord.ext.commands import group, Context, CommandError
 
 from useless_bot.utils import on_global_command_error
-from .bank import Bank
-from .general import General
-from .reddit import Reddit, Subreddit
-from .roles import Roles
+from useless_bot.cogs.bank import Bank
+from useless_bot.cogs.general import General
+from useless_bot.cogs.reddit.reddit import Reddit, Subreddit
+from useless_bot.cogs.roles.roles import Roles
+
+__all__ = ["Settings"]
 
 logger = logging.getLogger("useless_bot.cog.settings")
 

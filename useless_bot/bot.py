@@ -9,7 +9,7 @@ from nextcord.ext import commands
 from nextcord.ext.commands import check, errors, Context
 
 from . import __version__, __author__, __title__
-from .cogs import system, settings, roles, reddit, doujin, bank, general, arcade, music
+from .cogs import system, settings, roles, reddit, doujin, bank, general, arcade, music, activity
 from .core import bank_core, reddit_api
 
 logger = logging.getLogger("useless_bot.bot")
@@ -58,6 +58,7 @@ class UselessBot(commands.Bot):
         self.add_cog(settings.Settings(self))
         self.add_cog(system.System(self))
         self.add_cog(music.Music(self))
+        self.add_cog(activity.Activity(self))
 
     async def on_ready(self):
         """Log the start of bot"""

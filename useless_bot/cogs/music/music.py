@@ -226,8 +226,7 @@ class Music(commands.Cog):
             if ctx.uploader.voice:
                 return True
             else:
-                await ctx.send("You are not connected to a voice channel.")
-                raise commands.CommandError("Author not connected to a voice channel.")
+                raise AuthorNotConnected("Author not connected to a voice channel.")
         elif ctx.author.voice.channel != ctx.voice_client.channel and not self.bot.is_owner(ctx.author):
             raise VoiceNotTheSame("Author not connected to the same voice channel")
 

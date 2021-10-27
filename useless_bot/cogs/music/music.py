@@ -61,7 +61,7 @@ class Music(commands.Cog):
                     elif before.channel.members[0] == self.bot.user and after.channel:
                         await member.guild.voice_client.disconnect(force=False)
 
-    def get_voice(self, ctx: Context) -> PlayerState:
+    def _get_voice(self, ctx: Context) -> PlayerState:
         voice = self.voice_states.get(ctx.guild.id)
 
         if voice is None:
@@ -110,11 +110,11 @@ class Music(commands.Cog):
     async def play(self, ctx: Context, *, query: Union[YTLinkConverter, str]):
         """Play a song"""
         embed: Embed
-        voice = self.get_voice(ctx)
+        voice = self._get_voice(ctx)
 
         if isinstance(query, YTLink):  # if it's a supported link
             try:
-                result = await self.from_url(url=query, author=ctx.author)
+                result = await self._from_url(url=query, author=ctx.author)
             except NotFound:
                 await ctx.send("Cannot play this URL")
                 return
@@ -148,32 +148,18 @@ class Music(commands.Cog):
     @commands.command(aliases=["repeat"])
     async def loop(self, ctx: Context):
         """Toggle repeat"""
-        voice = self.voice_states.get(ctx.guild.id)
-
-        voice.loop = not voice.loop
-
-        if voice.loop:
-            await ctx.send("Enabled song loop")
-        else:
-            await ctx.send("Disabled song loop")
+        pass
 
     @commands.command()
     async def loopqueue(self, ctx: Context):
         """Toggle loopqueue"""
-        voice = self.voice_states.get(ctx.guild.id)
-
-        voice.loopqueue = not voice.loopqueue
-
-        if voice.loopqueue:
-            await ctx.send("Enabled loop queue")
-        else:
-            await ctx.send("Disabled loop queue")
+        pass
 
     @commands.command(aliases=["s"])
     async def skip(self, ctx: Context):
         """Vote for skipping a song"""
         author = ctx.author
-        voice_state = self.get_voice(ctx)
+        voice_state = self._get_voice(ctx)
 
         if author in voice_state.voice.channel.members:
             voice_state.skip_votes.add(author)
@@ -199,28 +185,25 @@ class Music(commands.Cog):
     async def forceskip(self, ctx: Context):
         # TODO: DJ role
         if ctx.author.guild_permissions.manage_channels or len(ctx.voice_client.channel.members) == 2:
-            voice_state = self.get_voice(ctx)
+            voice_state = self._get_voice(ctx)
             voice_state.skip()
 
             await ctx.send("Force skipped")
         else:
             raise MissingPermissions
 
+    @commands.command()
     @play.before_invoke
-    async def _connect(self, ctx: Context):
+    async def connect(self, ctx: Context):
         if ctx.voice_client is None:
             if ctx.author.voice:
                 await ctx.author.voice.channel.connect()
-                self.get_voice(ctx)
+                self._get_voice(ctx)
                 await ctx.send(f"Now connected to {ctx.author.voice.channel.mention}")
             else:
                 raise AuthorNotConnected("Author not connected to a voice channel.")
         elif ctx.author.voice.channel != ctx.voice_client.channel and not self.bot.is_owner(ctx.author):
             raise VoiceNotTheSame("Author not connected to the same voice channel")
-
-    @commands.command()
-    async def connect(self, ctx: Context):
-        await self._connect(ctx)
 
     @skip.before_invoke
     @forceskip.before_invoke
@@ -265,7 +248,7 @@ class Music(commands.Cog):
 
         return VoiceEntry.from_data(data=data["entries"][0], author=author)
 
-    async def from_url(self, author: Member, url: YTLink) -> Union[VoiceEntry, Playlist]:
+    async def _from_url(self, author: Member, url: YTLink) -> Union[VoiceEntry, Playlist]:
         loop = asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: self.ytdl.extract_info(url, download=False))
 

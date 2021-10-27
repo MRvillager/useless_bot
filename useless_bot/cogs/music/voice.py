@@ -83,9 +83,10 @@ class PlayerState:
             self.voice.stop()
 
     def _play(self, error: Optional = None):
+        breakpoint()
         if error is not None:
             logger.warning(error)
-        if not self._queue.is_empty or (self.loop and self.current is not None):
+        elif not self._queue.is_empty or (self.loop and self.current is not None):
             self.bot.loop.call_soon_threadsafe(self._play_next_song.set)
         else:
             self.current = None

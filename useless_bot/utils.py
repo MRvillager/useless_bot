@@ -18,12 +18,10 @@ def parse_seconds(seconds: int) -> str:
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
 
-    result = ""
+    result = "%(minutes)02d:%(seconds)02d" % {"minutes": minutes, "seconds": seconds}
 
     if hours != 0:
-        result += f"{hours}:"
-
-    result += f"{minutes}:{seconds}"
+        result = f"{hours}:" + result
     return result
 
 
@@ -95,11 +93,13 @@ async def on_global_command_error(ctx: Context, error: errors.CommandError) -> b
         base_logger.critical("Max concurrency reached. You may need to scale up the bot")
     elif isinstance(error, errors.NotOwner):
         pass
-    elif isinstance(error, (errors.BotMissingPermissions, errors.MissingPermissions, Forbidden)):
+    elif isinstance(error, (errors.BotMissingPermissions, Forbidden)):
         try:
             await ctx.send("This command cannot be used because I lack some of the needed permissions")
-        except (errors.BotMissingPermissions, errors.MissingPermissions):
+        except errors.BotMissingPermissions:
             pass
+    elif isinstance(error, errors.MissingPermissions):
+        await ctx.send("You can't use this command because you don't have the required permissions")
     elif isinstance(error, errors.NSFWChannelRequired):
         await ctx.send("You cannot use this command in a no-NSFW channel")
     else:

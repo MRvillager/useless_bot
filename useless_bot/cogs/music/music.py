@@ -6,7 +6,7 @@ import nextcord
 import youtube_dl
 from nextcord import Embed, Color, Member, VoiceState
 from nextcord.ext import commands
-from nextcord.ext.commands import Context, has_permissions, CommandError, Bot
+from nextcord.ext.commands import Context, has_permissions, CommandError, Bot, MissingPermissions
 
 from useless_bot.core.ytdl_options import ytdl_format_options, ffmpeg_options
 from useless_bot.utils import on_global_command_error, parse_seconds
@@ -178,11 +178,14 @@ class Music(commands.Cog):
         if author in voice_state.voice.channel.members:
             voice_state.skip_votes.add(author)
 
-        if len(voice_state.skip_votes) > (len(voice_state.voice.channel.members) // 2):
+        skip_votes = len(voice_state.skip_votes)
+        min_skip_votes = len(voice_state.voice.channel.members) // 2
+
+        if skip_votes >= min_skip_votes:
             voice_state.skip()
             await ctx.send("Skipped")
         else:
-            await ctx.send(f"{len(voice_state.skip_votes)}/{voice_state.voice.channel.member_count / 2} votes")
+            await ctx.send(f"{skip_votes}/{min_skip_votes} votes")
 
     @commands.command(aliases=["fuckoff"])
     @has_permissions(manage_channels=True)
@@ -193,13 +196,15 @@ class Music(commands.Cog):
         await ctx.send("Successfully disconnected")
 
     @commands.command(aliases=["fs"])
-    @has_permissions(manage_channels=True)
     async def forceskip(self, ctx: Context):
         # TODO: DJ role
-        voice_state = self.get_voice(ctx)
-        voice_state.skip()
+        if ctx.author.guild_permissions.manage_channels or len(ctx.voice_client.channel.members) == 2:
+            voice_state = self.get_voice(ctx)
+            voice_state.skip()
 
-        await ctx.send("Force skipped")
+            await ctx.send("Force skipped")
+        else:
+            raise MissingPermissions
 
     @play.before_invoke
     async def _connect(self, ctx: Context):

@@ -85,7 +85,7 @@ class PlayerState:
     def _play(self, error: Optional = None):
         if error is not None:
             logger.warning(error)
-        if not self._queue.is_empty:
+        if not self._queue.is_empty or (self.loop and self.current is not None):
             self.bot.loop.call_soon_threadsafe(self._play_next_song.set)
         else:
             self.current = None

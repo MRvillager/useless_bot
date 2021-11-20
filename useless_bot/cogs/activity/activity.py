@@ -68,16 +68,36 @@ class Activity(Cog):
     @command()
     async def youtube(self, ctx: Context):
         """Launches watch together application"""
-        await self.base_activity_launcher(ctx=ctx, app_id=755600276941176913)
+        await self.base_activity_launcher(ctx=ctx, app_id=880218394199220334)
 
     @command()
     async def chess(self, ctx: Context):
-        """Launches a chess game"""
+        """Launches a chess in the park game"""
         await self.base_activity_launcher(ctx=ctx, app_id=832012774040141894)
 
     @command()
+    async def checkers(self, ctx: Context):
+        """Launches a checkers in the park game"""
+        await self.base_activity_launcher(ctx=ctx, app_id=832013003968348200)
+
+    @command()
+    async def spell(self, ctx: Context):
+        """Launches a spell cast game"""
+        await self.base_activity_launcher(ctx=ctx, app_id=852509694341283871)
+
+    @command()
+    async def letter(self, ctx: Context):
+        """Launches a letter tile game"""
+        await self.base_activity_launcher(ctx=ctx, app_id=879863686565621790)
+
+    @command()
+    async def doddle(self, ctx: Context):
+        """Launches a doddle crew ame"""
+        await self.base_activity_launcher(ctx=ctx, app_id=878067389634314250)
+
+    @command()
     async def poker(self, ctx: Context):
-        """Launches a poker game"""
+        """Launches a poker night game"""
         await self.base_activity_launcher(ctx=ctx, app_id=755827207812677713)
 
     @command()

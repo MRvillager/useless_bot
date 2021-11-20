@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from nextcord import Member, TextChannel
+from nextcord import Member, TextChannel, Message
 from nextcord.ext import commands
 from nextcord.ext.commands import Bot, Context, CommandError, has_permissions, bot_has_permissions, check
 
@@ -98,4 +98,7 @@ class General(commands.Cog):
     async def delete(self, ctx: Context, message_id: Optional[int] = None):
         """Delete a message"""
         if message_id is None:
-            ctx.re
+            message_id = ctx.message.reference.message_id
+
+        message: Message = await ctx.channel.fetch_message(message_id)
+        await message.delete()

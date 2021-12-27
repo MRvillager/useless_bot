@@ -1,19 +1,17 @@
 import datetime
 import logging
-import nextcord
 
+import nextcord
 from nextcord import InviteTarget, Embed, Color, ButtonStyle
 from nextcord.ext.commands import Bot, Cog, command, Context, CommandError
 
 from useless_bot.cogs.music.errors import AuthorNotConnected
 from useless_bot.utils import on_global_command_error
 
-
 # Application ids source: https://gist.github.com/Bendimester23/98cdabec9dedc18a97d3d2bb68715919
 
 
 __all__ = ["Activity"]
-
 
 logger = logging.getLogger("useless_bot.cog.activity")
 

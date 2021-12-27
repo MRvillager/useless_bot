@@ -4,6 +4,7 @@ from os import getenv
 from typing import Any
 
 import aiohttp
+from lavalink import lavalink
 from nextcord import Status, Game, Intents
 from nextcord.ext import commands
 from nextcord.ext.commands import check, errors, Context
@@ -64,6 +65,13 @@ class UselessBot(commands.Bot):
         """Log the start of bot"""
         logger.info(f"Logged in as {self.user} ({self.user.id})")
 
+        await lavalink.initialize(
+            self,
+            host=getenv("LAVALINK_HOST"),
+            password=getenv("LAVALINK_PASSWORD"),
+            ws_port=int(getenv("LAVALINK_PORT"))
+        )
+
         if self.debug:
             await self.change_presence(status=Status.do_not_disturb, activity=Game(name="Testing new release"))
         else:
@@ -88,6 +96,7 @@ class UselessBot(commands.Bot):
             return
 
         self._closed = True
+        await lavalink.close(self)
 
         for voice in self.voice_clients:
             # noinspection PyBroadException

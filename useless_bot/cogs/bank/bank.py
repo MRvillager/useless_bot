@@ -1,8 +1,8 @@
 import logging
-import nextcord
-
 from time import time
 from typing import Union, Optional
+
+import nextcord
 from nextcord import Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Bot, group, Context, CommandError

@@ -1,7 +1,7 @@
 import logging
 import re
-import aiohttp
 
+import aiohttp
 from nextcord import Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Bot, is_nsfw, Context, CommandError

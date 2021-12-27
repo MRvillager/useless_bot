@@ -5,7 +5,6 @@ from os import getenv
 from .bot import UselessBot
 from .utils import set_up_logging
 
-
 debug = bool(int(getenv("DEBUG", 0)))
 set_up_logging(debug=debug)
 logger = logging.getLogger("useless_bot")

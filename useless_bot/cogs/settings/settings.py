@@ -4,11 +4,11 @@ from typing import Optional
 from nextcord.ext import commands
 from nextcord.ext.commands import group, Context, CommandError
 
-from useless_bot.utils import on_global_command_error
 from useless_bot.cogs.bank import Bank
 from useless_bot.cogs.general import General
 from useless_bot.cogs.reddit.reddit import Reddit, Subreddit
 from useless_bot.cogs.roles.roles import Roles
+from useless_bot.utils import on_global_command_error
 
 __all__ = ["Settings"]
 

@@ -96,6 +96,7 @@ class Music(commands.Cog):
 
         # play music
         if not player.current:
+            await ctx.send("▶ Now playing")
             await player.play()
 
     @commands.command(aliases=["repeat"])
@@ -105,41 +106,60 @@ class Music(commands.Cog):
         player.repeat = not player.repeat
 
         if player.repeat:
-            await ctx.send("Loop on")
+            await ctx.send("🔂 Loop on")
         else:
-            await ctx.send("Loop off")
+            await ctx.send("➡ Loop off")
 
     @commands.command()
     async def stop(self, ctx: Context):
         """Stop and clear queue"""
         player = await self._get_player(ctx)
         await player.stop()
-        await ctx.send("Stopped music")
+        await ctx.send("⏹ Stopped music")
 
     @commands.command(aliases=["s"])
     async def skip(self, ctx: Context):
         """Skip current song"""
         player = await self._get_player(ctx)
         await player.skip()
-        await ctx.send("Skipped")
+        await ctx.send("⏩ Skipped")
 
     @commands.command()
     async def pause(self, ctx: Context):
         """Pause current song"""
         player = await self._get_player(ctx)
         await player.pause()
-        await ctx.send("Paused")
+        await ctx.send("⏸ Paused")
 
     @commands.command()
     async def resume(self, ctx: Context):
         """Resume current song"""
         player = await self._get_player(ctx)
         await player.pause(pause=True)
-        await ctx.send("Now playing")
+        await ctx.send("⏯ Now playing")
 
     @commands.command(aliases=["fuckoff"])
     async def quit(self, ctx: Context):
         """Disconnect bot from channel"""
         player = await self._get_player(ctx)
         await player.disconnect()
-        await ctx.send("Successfully disconnected")
+        await ctx.send("⭕ Successfully disconnected")
+
+    @commands.command(aliases=["shufflequeue"])
+    async def shuffle(self, ctx: Context):
+        """Disconnect bot from channel"""
+        player = await self._get_player(ctx)
+        await player.force_shuffle()
+        await ctx.send("🔀 Queue shuffled")
+
+    @commands.command(aliases=["shufflequeue"])
+    async def loopqueue(self, ctx: Context):
+        """Disconnect bot from channel"""
+        player = await self._get_player(ctx)
+
+        player.loopqueue = not player.loopqueue
+
+        if player.loopqueue:
+            await ctx.send("🔁 Loopqueue on")
+        else:
+            await ctx.send("➡ Loopqueue off")

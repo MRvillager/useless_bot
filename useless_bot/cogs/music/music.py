@@ -152,7 +152,7 @@ class Music(commands.Cog):
         await player.force_shuffle()
         await ctx.send("🔀 Queue shuffled")
 
-    @commands.command(aliases=["shufflequeue"])
+    @commands.command()
     async def loopqueue(self, ctx: Context):
         """Disconnect bot from channel"""
         player = await self._get_player(ctx)

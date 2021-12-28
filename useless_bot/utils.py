@@ -56,14 +56,16 @@ def set_up_logging(debug: bool = False):
     # Add handler
     handlers.append(stdout_handler)
 
+    # Create timed file handler
+    file_handler = logging.handlers.TimedRotatingFileHandler("logs/useless_bot.log", when="midnight", encoding="utf-16")
+    file_handler.setFormatter(stdout_formatter)
+    # Set logging level
     if debug:
-        # Create timed file handler
-        file_handler = logging.handlers.TimedRotatingFileHandler("logs/useless_bot.log", when="midnight")
-        file_handler.setFormatter(stdout_formatter)
-        # Set logging level
         file_handler.setLevel(logging.DEBUG)
-        # Add handler
-        handlers.append(file_handler)
+    else:
+        file_handler.setLevel(logging.INFO)
+    # Add handler
+    handlers.append(file_handler)
 
     for logger in loggers:
         # remove already set up handlers from logger

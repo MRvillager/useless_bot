@@ -64,10 +64,14 @@ class Music(commands.Cog):
         embed = Embed(color=Color.random(), type="link")
 
         embed.title = result.title
+        embed.url = result.uri
         embed.set_author(name=result.author)
         embed.set_thumbnail(url=result.thumbnail)
 
-        embed.add_field(name="Video duration", value=parse_seconds(result.length // 1000))
+        if not result.is_stream:
+            embed.add_field(name="Video duration", value=parse_seconds(result.length // 1000))
+        else:
+            embed.add_field(name="Live on", value=result.source)
 
         return embed
 
@@ -135,7 +139,7 @@ class Music(commands.Cog):
     async def resume(self, ctx: Context):
         """Resume current song"""
         player = await self._get_player(ctx)
-        await player.pause(pause=True)
+        await player.pause(pause=False)
         await ctx.send("⏯ Now playing")
 
     @commands.command(aliases=["fuckoff"])
@@ -147,14 +151,14 @@ class Music(commands.Cog):
 
     @commands.command(aliases=["shufflequeue"])
     async def shuffle(self, ctx: Context):
-        """Disconnect bot from channel"""
+        """Shuffle queue"""
         player = await self._get_player(ctx)
         await player.force_shuffle()
         await ctx.send("🔀 Queue shuffled")
 
     @commands.command()
     async def loopqueue(self, ctx: Context):
-        """Disconnect bot from channel"""
+        """Toggle loop queue"""
         player = await self._get_player(ctx)
 
         player.loopqueue = not player.loopqueue
@@ -164,33 +168,72 @@ class Music(commands.Cog):
         else:
             await ctx.send("➡ Loopqueue off")
 
-    @commands.command(aliases=["nightcore"])
-    async def timescale(self, ctx: Context, speed: float = 1.2, pitch: float = 1.1, rate: float = 1.2):
-        """Disconnect bot from channel"""
+    @commands.command()
+    async def timescale(self, ctx: Context, speed: float, pitch: float, rate: float):
+        """Apply timescale effect to music"""
         player = await self._get_player(ctx)
         await player.timescale(speed, pitch, rate)
         await ctx.send("🆒 Timescaled successful")
 
     @commands.command()
+    async def nightcore(self, ctx: Context):
+        """Apply nightcore effect to music"""
+        player = await self._get_player(ctx)
+        await player.nightcore()
+        await ctx.send("🆖 Nightcore applied successful")
+
+    @commands.command()
+    async def slowmotion(self, ctx: Context):
+        """Apply slowmotion effect to music"""
+        player = await self._get_player(ctx)
+        await player.timescale(1, 1, 0.7)
+        await ctx.send("🕗 Slowmotion applied successful")
+
+    @commands.command()
     async def bassboost(self, ctx: Context):
+        """Apply bassboost effect to music"""
         player = await self._get_player(ctx)
         await player.bass_boost()
         await ctx.send("🅱 Bass boost enabled")
 
     @commands.command()
     async def karaoke(self, ctx: Context):
+        """Apply karaoke effect to music"""
         player = await self._get_player(ctx)
         await player.karaoke()
         await ctx.send("🎤 Karaoke enabled")
 
-    @commands.command()
+    @commands.command(aliases=["earrape"])
     async def distortion(self, ctx: Context):
+        """Apply distortion effect to music. DO NOT USE"""
         player = await self._get_player(ctx)
         await player.random_distortion()
         await ctx.send("🔣 Random distortion on")
 
     @commands.command()
     async def rotation(self, ctx: Context):
+        """Apply rotation effect to music"""
         player = await self._get_player(ctx)
         await player.rotation()
         await ctx.send("🌀 Rotation on")
+
+    @commands.command()
+    async def tremolo(self, ctx: Context):
+        """Apply tremolo effect to music"""
+        player = await self._get_player(ctx)
+        await player.tremolo()
+        await ctx.send("〰 Tremolo on")
+
+    @commands.command()
+    async def vibrato(self, ctx: Context):
+        """Apply vibrato effect to music"""
+        player = await self._get_player(ctx)
+        await player.vibrato()
+        await ctx.send("〰 Vibrato on")
+
+    @commands.command()
+    async def reset(self, ctx: Context):
+        """Remove all effects to music"""
+        player = await self._get_player(ctx)
+        await player.reset_filter()
+        await ctx.send("🆓 Effects removed")

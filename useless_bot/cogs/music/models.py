@@ -21,7 +21,7 @@ class URLConverter(commands.Converter):
     def is_supported(url: str) -> bool:
         p_url = yarl.URL(url)
 
-        if p_url.host in ["youtu.be", "youtube.com", "soundcloud.com"]:
+        if p_url.host.replace("www.", "") in ["youtu.be", "youtube.com", "soundcloud.com", "twitch.tv"]:
             return True
         else:
             return False

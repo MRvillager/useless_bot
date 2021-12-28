@@ -216,7 +216,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "useless-lavalink"
-version = "1.3.2"
+version = "1.3.6.1"
 description = "A fork of Red-Lavalink for useless_bot"
 category = "main"
 optional = false
@@ -737,8 +737,8 @@ six = [
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
 ]
 useless-lavalink = [
-    {file = "useless_lavalink-1.3.2-py3-none-any.whl", hash = "sha256:cd729fe43d3affee98dc804fe8286201d87aed0225190e265187c6ab0bedb23e"},
-    {file = "useless_lavalink-1.3.2.tar.gz", hash = "sha256:6d35037ca9964c122f723d68bd3b859316bffd96f5f5247eec599566cbe11aee"},
+    {file = "useless_lavalink-1.3.6.1-py3-none-any.whl", hash = "sha256:e54dac4c10a62a400988164dbfb5af1e1389e779cb0fc610b06c37871696a5d2"},
+    {file = "useless_lavalink-1.3.6.1.tar.gz", hash = "sha256:b041982a691b721bb26c8276c01a42438a434d03b97f67cea927d397abf766cf"},
 ]
 uvloop = [
     {file = "uvloop-0.16.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:6224f1401025b748ffecb7a6e2652b17768f30b1a6a3f7b44660e5b5b690b12d"},

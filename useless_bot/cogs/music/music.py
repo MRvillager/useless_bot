@@ -24,17 +24,17 @@ class Music(commands.Cog):
 
     async def cog_command_error(self, ctx: Context, error: CommandError) -> None:
         if isinstance(error, AuthorNotConnected):
-            await ctx.send("You are not connected to a voice channel")
+            await ctx.send("❌ You are not connected to a voice channel")
         elif isinstance(error, NotFound):
-            await ctx.send("Cannot play this URL")
+            await ctx.send("❌ Cannot play this URL")
         elif isinstance(error, URLNotSupported):
-            await ctx.send("This URL is not supported")
+            await ctx.send("❌ This URL is not supported")
         elif isinstance(error, PlaylistIsEmpty):
-            await ctx.send("This Playlist is empty")
+            await ctx.send("❌ This Playlist is empty")
         elif isinstance(error, VoiceNotTheSame):
-            await ctx.send("I'm already in a channel. You must connect to it to give me orders")
+            await ctx.send("❌ I'm already in a channel. You must connect to it to give me orders")
         elif isinstance(error, KeyError) or isinstance(error, IndexError):
-            await ctx.send("Parsing error")
+            await ctx.send("❌ Parsing error")
             logger.error(f"Parsing error occurred", exc_info=True)
         elif not await on_global_command_error(ctx, error):
             logger.error(f"Exception occurred", exc_info=True)
@@ -163,3 +163,34 @@ class Music(commands.Cog):
             await ctx.send("🔁 Loopqueue on")
         else:
             await ctx.send("➡ Loopqueue off")
+
+    @commands.command(aliases=["nightcore"])
+    async def timescale(self, ctx: Context, speed: float = 1.2, pitch: float = 1.1, rate: float = 1.2):
+        """Disconnect bot from channel"""
+        player = await self._get_player(ctx)
+        await player.timescale(speed, pitch, rate)
+        await ctx.send("🆒 Timescaled successful")
+
+    @commands.command()
+    async def bassboost(self, ctx: Context):
+        player = await self._get_player(ctx)
+        await player.bass_boost()
+        await ctx.send("🅱 Bass boost enabled")
+
+    @commands.command()
+    async def karaoke(self, ctx: Context):
+        player = await self._get_player(ctx)
+        await player.karaoke()
+        await ctx.send("🎤 Karaoke enabled")
+
+    @commands.command()
+    async def distortion(self, ctx: Context):
+        player = await self._get_player(ctx)
+        await player.random_distortion()
+        await ctx.send("🔣 Random distortion on")
+
+    @commands.command()
+    async def rotation(self, ctx: Context):
+        player = await self._get_player(ctx)
+        await player.rotation()
+        await ctx.send("🌀 Rotation on")

@@ -65,7 +65,8 @@ class UselessBot(commands.Bot):
         """Log the start of bot"""
         logger.info(f"Logged in as {self.user} ({self.user.id})")
 
-        await lavalink.initialize(
+        await lavalink.initialize(self)
+        await lavalink.add_node(
             self,
             host=getenv("LAVALINK_HOST"),
             password=getenv("LAVALINK_PASSWORD"),

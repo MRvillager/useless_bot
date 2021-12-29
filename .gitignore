@@ -81,6 +81,11 @@ installer.cfg
 known_hosts
 .netrc
 
+# poetry
+poetry.toml
+.venv/
+
+
 # Bot Data
 data/config/*.json
 data/config.json

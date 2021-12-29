@@ -34,7 +34,7 @@ COPY --chown=bot:bot ./poetry.lock ./pyproject.toml /bot/
 
 # install project dependecies
 RUN /usr/local/bin/python -m pip install --upgrade pip \
-    && /usr/local/bin/python -m poetry install --no-dev --no-interaction --no-ansi \
+    && poetry install --no-dev --no-interaction --no-ansi \
     && rm -rf "$POETRY_CACHE_DIR"
 
 # Copy project

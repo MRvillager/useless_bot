@@ -1,6 +1,8 @@
 FROM python:3.9-slim-bullseye
 
-ENV PYTHONFAULTHANDLER=1 \
+ENV BUILD_ONLY_PACKAGES='curl gcc' \
+  # python
+  PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \
   PYTHONHASHSEED=random \
   PYTHONDONTWRITEBYTECODE=1 \
@@ -17,7 +19,7 @@ ENV PYTHONFAULTHANDLER=1 \
 # System deps
 RUN apt-get update  \
     && apt-get -y full-upgrade \
-    && apt-get install -y curl gcc \
+    && apt-get install -y $BUILD_ONLY_PACKAGES \
     && curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - \
     && poetry --version \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
@@ -37,7 +39,10 @@ COPY --chown=bot:bot ./poetry.lock ./pyproject.toml /bot/
 # install project dependecies
 RUN python -m pip install --upgrade pip \
     && poetry install --no-dev --no-interaction --no-ansi \
-    && rm -rf "$POETRY_CACHE_DIR"
+    && rm -rf "$POETRY_CACHE_DIR" \
+
+# remove temporary deps
+RUN apt-get remove -y $BUILD_ONLY_PACKAGES
 
 # Copy project
 COPY --chown=bot:bot . /bot

@@ -1,6 +1,6 @@
 FROM python:3.9-slim-bullseye
 
-ENV BUILD_ONLY_PACKAGES='curl gcc' \
+ENV BUILD_ONLY_PACKAGES='curl' \
   # python
   PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \
@@ -18,10 +18,10 @@ ENV BUILD_ONLY_PACKAGES='curl gcc' \
 
 # System deps
 RUN if [ "$(dpkg --print-architecture)" = "armhf" ] || [ "$(dpkg --print-architecture)" = "arm64" ]; \
-    then export PIP_INDEX_URL="https://www.piwheels.org/simple/"; fi \
+    then export PIP_INDEX_URL="https://www.piwheels.org/simple/"; echo sus; fi \
     && apt-get update \
     && apt-get -y full-upgrade \
-    && apt-get install -y $BUILD_ONLY_PACKAGES \
+    && apt-get install -y build-essential libssl-dev libffi-dev python-dev $BUILD_ONLY_PACKAGES \
     && curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - \
     && poetry --version \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \

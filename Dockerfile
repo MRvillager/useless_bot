@@ -18,7 +18,7 @@ ENV PYTHONFAULTHANDLER=1 \
 RUN apt-get update  \
     && apt-get -y full-upgrade \
     && apt-get install -y curl \
-    && curl -sSL 'https://install.python-poetry.org' | python - \
+    && curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - \
     && poetry --version \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && apt-get clean -y \

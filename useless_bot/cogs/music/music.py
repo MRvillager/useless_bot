@@ -25,12 +25,8 @@ class Music(commands.Cog):
     async def cog_command_error(self, ctx: Context, error: CommandError) -> None:
         if isinstance(error, AuthorNotConnected):
             await ctx.send("❌ You are not connected to a voice channel")
-        elif isinstance(error, NotFound):
-            await ctx.send("❌ Cannot play this URL")
         elif isinstance(error, URLNotSupported):
             await ctx.send("❌ This URL is not supported")
-        elif isinstance(error, PlaylistIsEmpty):
-            await ctx.send("❌ This Playlist is empty")
         elif isinstance(error, VoiceNotTheSame):
             await ctx.send("❌ I'm already in a channel. You must connect to it to give me orders")
         elif isinstance(error, KeyError) or isinstance(error, IndexError):

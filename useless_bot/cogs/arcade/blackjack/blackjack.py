@@ -177,7 +177,7 @@ class Blackjack(View):
             f"The session owner is {self.author.name}"
         )
         for i, (user_id, player) in enumerate(self.players.items()):
-            embed.add_field(name=f"Player {i + 1}", value=f"{player.name} - <@{user_id}>\nBet: {player.bet}",
+            embed.add_field(name=f"Player {i + 1}", value=f"{player.name} - <@{user_id}>\nBet: {self.bet}",
                             inline=False)
 
         if interaction is None:

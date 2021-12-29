@@ -15,7 +15,8 @@ ENV PYTHONFAULTHANDLER=1 \
   PATH="$PATH:/root/.local/bin"
 
 # System deps
-RUN apt-get update && apt-get -y full-upgrade && \
+RUN apt-get update  \
+    && apt-get -y full-upgrade \
     && curl -sSL 'https://install.python-poetry.org' | python - \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && apt-get clean -y \

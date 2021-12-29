@@ -84,7 +84,7 @@ known_hosts
 # poetry
 poetry.toml
 .venv/
-
+.local
 
 # Bot Data
 data/config/*.json

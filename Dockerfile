@@ -39,7 +39,7 @@ COPY --chown=bot:bot ./poetry.lock ./pyproject.toml /bot/
 # install project dependecies
 RUN python -m pip install --upgrade pip \
     && poetry install --no-dev --no-interaction --no-ansi \
-    && apt-get purge $BUILD_ONLY_PACKAGES \
+    && apt-get purge -y $BUILD_ONLY_PACKAGES \
     && rm -rf "$POETRY_CACHE_DIR" \
     && curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python - --uninstall
 

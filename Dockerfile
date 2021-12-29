@@ -13,7 +13,7 @@ ENV BUILD_ONLY_PACKAGES='curl gcc' \
   # poetry
   POETRY_NO_INTERACTION=1 \
   POETRY_VIRTUALENVS_CREATE=false \
-  POETRY_CACHE_DIR='/var/cache/pypoetry' \
+  POETRY_CACHE_DIR="/var/cache/pypoetry" \
   PATH="$PATH:/root/.poetry/bin"
 
 # System deps
@@ -39,10 +39,9 @@ COPY --chown=bot:bot ./poetry.lock ./pyproject.toml /bot/
 # install project dependecies
 RUN python -m pip install --upgrade pip \
     && poetry install --no-dev --no-interaction --no-ansi \
+    && apt-get purge $BUILD_ONLY_PACKAGES \
     && rm -rf "$POETRY_CACHE_DIR" \
-
-# remove temporary deps
-RUN apt-get remove -y $BUILD_ONLY_PACKAGES
+    && curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python - --uninstall
 
 # Copy project
 COPY --chown=bot:bot . /bot

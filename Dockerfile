@@ -17,7 +17,9 @@ ENV BUILD_ONLY_PACKAGES='curl gcc' \
   PATH="$PATH:/root/.poetry/bin"
 
 # System deps
-RUN apt-get update  \
+RUN if [ "$(dpkg --print-architecture)" = "armhf" ] || [ "$(dpkg --print-architecture)" = "arm64" ]; \
+    then export PIP_INDEX_URL="https://www.piwheels.org/simple/"; fi \
+    && apt-get update \
     && apt-get -y full-upgrade \
     && apt-get install -y $BUILD_ONLY_PACKAGES \
     && curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - \

@@ -14,11 +14,6 @@ classifiers = [
     "Topic :: Communications :: Chat",
 ]
 
-[[tool.poetry.source]]
-name = "pi"
-url = "https://www.piwheels.org/simple/"
-secondary = true
-
 [tool.poetry.dependencies]
 python = "^3.9"
 aiorwlock = "^1"

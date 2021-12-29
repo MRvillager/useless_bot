@@ -232,7 +232,7 @@ json = ["orjson", "aiofiles"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "0d85c38ec66b242bdba1042f14a32d0c51cc16b4858a125a26864a212e0720ed"
+content-hash = "e7c7dda87fe94941f67ed9debdec6903888e1ff1ca0d3d41d2f583987f065107"
 
 [metadata.files]
 aiodns = [

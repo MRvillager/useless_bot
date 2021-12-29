@@ -1,4 +1,5 @@
 import logging
+import random
 
 from nextcord import Embed
 from nextcord.ext import commands
@@ -46,3 +47,11 @@ class Arcade(commands.Cog, name="Games"):
         embed.title = "Blackjack"
         msg = await ctx.send(embed=embed, view=view)
         await view.start_page(message=msg)
+
+    @game.command()
+    async def flip(self, ctx: Context):
+        """Flip a coin"""
+        if random.randint(0, 1) == 0:
+            await ctx.send("🪙 Tails 🪙")
+        else:
+            await ctx.send("🪙 Heads 🪙")

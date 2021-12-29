@@ -17,7 +17,9 @@ ENV PYTHONFAULTHANDLER=1 \
 # System deps
 RUN apt-get update  \
     && apt-get -y full-upgrade \
+    && apt-get install -y curl \
     && curl -sSL 'https://install.python-poetry.org' | python - \
+    && poetry --version \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
@@ -33,7 +35,7 @@ RUN groupadd -r bot && useradd -d /bot -r -g bot bot \
 COPY --chown=bot:bot ./poetry.lock ./pyproject.toml /bot/
 
 # install project dependecies
-RUN /usr/local/bin/python -m pip install --upgrade pip \
+RUN python -m pip install --upgrade pip \
     && poetry install --no-dev --no-interaction --no-ansi \
     && rm -rf "$POETRY_CACHE_DIR"
 

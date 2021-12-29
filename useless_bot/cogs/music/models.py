@@ -12,8 +12,6 @@ __all__ = [
     "URLConverter",
 ]
 
-VOLUME = 1
-
 
 class URLConverter(commands.Converter):
     @staticmethod

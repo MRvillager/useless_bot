@@ -5,7 +5,7 @@ import lavalink
 import yarl
 from lavalink import Player, Track
 from lavalink.rest_api import LoadResult
-from nextcord import Embed, Color
+from nextcord import Embed, Color, VoiceState, Member
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, CommandError, Bot
 
@@ -37,23 +37,29 @@ class Music(commands.Cog):
             await ctx.send("❌ Parsing error")
             logger.error(f"Parsing error occurred", exc_info=True)
         elif not await on_global_command_error(ctx, error):
+            await ctx.send("❌ Unexpected error")
             logger.error(f"Exception occurred", exc_info=True)
 
     @staticmethod
-    async def _get_player(ctx: Context) -> Player:
+    async def _get_player(ctx: Context, connect: bool = False) -> Player:
         try:
             player = lavalink.get_player(ctx.guild.id)
         except KeyError:
-            player = await lavalink.connect(ctx.author.voice.channel, True)
+            if connect:
+                player = await lavalink.connect(ctx.author.voice.channel, True)
+                await ctx.send(f"🎵 Connected to {ctx.author.voice.channel.mention}")
+            else:
+                raise AuthorNotConnected
 
         return player
 
     @staticmethod
     async def playlist_embed(result: LoadResult) -> Embed:
-        embed = Embed(color=Color.random(), type="link")
+        track = result.tracks[0]
+        embed = Embed(color=Color.red(), type="link")
 
         embed.title = result.playlist_info.name
-        embed.set_thumbnail(url=result.tracks[0].thumbnail)
+        embed.set_thumbnail(url=track.thumbnail)
 
         embed.add_field(name="Enqueued", value=len(result.tracks))
 
@@ -61,7 +67,16 @@ class Music(commands.Cog):
 
     @staticmethod
     async def song_embed(result: Track) -> Embed:
-        embed = Embed(color=Color.random(), type="link")
+        if result.source == "twitch":
+            color = Color.purple()
+        elif result.source == "youtube":
+            color = Color.red()
+        elif result.source == "soundcloud":
+            color = Color.orange()
+        else:
+            color = Color.random()
+
+        embed = Embed(color=color, type="link")
 
         embed.title = result.title
         embed.url = result.uri
@@ -75,11 +90,26 @@ class Music(commands.Cog):
 
         return embed
 
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, _: Member, before: VoiceState, __: VoiceState):
+        """Disconnect bot if it's the only one in the voice channel"""
+        try:
+            if len(before.channel.members) == 1:
+                if before.channel.members[0] == self.bot.user:
+                    try:
+                        player = lavalink.get_player(before.channel.guild.id)
+                    except KeyError:
+                        await before.channel.guild.voice_client.disconnect(force=True)
+                    else:
+                        await player.disconnect()
+        except AttributeError:
+            return
+
     @commands.command(aliases=["p", "pp"])
     async def play(self, ctx: Context, *, query: Union[URLConverter, str]):
         """Play a song"""
         embed: Embed
-        player = await self._get_player(ctx)
+        player = await self._get_player(ctx, connect=True)
 
         if isinstance(query, yarl.URL):
             # noinspection PyTypeChecker

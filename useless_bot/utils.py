@@ -1,4 +1,5 @@
 import logging
+import os.path
 from logging.handlers import TimedRotatingFileHandler
 
 from nextcord.errors import Forbidden
@@ -56,16 +57,21 @@ def set_up_logging(debug: bool = False):
     # Add handler
     handlers.append(stdout_handler)
 
-    # Create timed file handler
-    file_handler = logging.handlers.TimedRotatingFileHandler("logs/useless_bot.log", when="midnight", encoding="utf-16")
-    file_handler.setFormatter(stdout_formatter)
-    # Set logging level
-    if debug:
-        file_handler.setLevel(logging.DEBUG)
-    else:
-        file_handler.setLevel(logging.INFO)
-    # Add handler
-    handlers.append(file_handler)
+    if os.path.isdir("logs/"):  # check if directory exists
+        # Create rotating file handler
+        file_handler = logging.handlers.TimedRotatingFileHandler(
+            "logs/useless_bot.log",
+            when="midnight",
+            encoding="utf-8"
+        )
+        file_handler.setFormatter(stdout_formatter)
+        # Set logging level
+        if debug:
+            file_handler.setLevel(logging.DEBUG)
+        else:
+            file_handler.setLevel(logging.INFO)
+        # Add handler
+        handlers.append(file_handler)
 
     for logger in loggers:
         # remove already set up handlers from logger

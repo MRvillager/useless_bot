@@ -1,15 +1,49 @@
 FROM python:3.9-slim-bullseye
+
+ENV
+  # python:
+  PYTHONFAULTHANDLER=1 \
+  PYTHONUNBUFFERED=1 \
+  PYTHONHASHSEED=random \
+  PYTHONDONTWRITEBYTECODE=1 \
+  # pip:
+  PIP_NO_CACHE_DIR=off \
+  PIP_DISABLE_PIP_VERSION_CHECK=on \
+  PIP_DEFAULT_TIMEOUT=100 \
+  # poetry:
+  POETRY_NO_INTERACTION=1 \
+  POETRY_VIRTUALENVS_CREATE=false \
+  POETRY_CACHE_DIR='/var/cache/pypoetry' \
+  PATH="$PATH:/root/.local/bin"
+
+# System deps
+RUN apt-get update && apt-get -y full-upgrade && \
+    && apt-get install -y git \
+    && curl -sSL 'https://install.python-poetry.org' | python - \
+    # Cleaning cache:
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
+# Change workdir
 WORKDIR /bot
 
-COPY . .
+# Setting up proper permissions:
+RUN groupadd -r bot && useradd -d /bot -r -g bot bot \
+    && chown bot:bot -R /bot
 
-RUN apt-get update && apt-get install --no-install-recommends -y ffmpeg libffi-dev libnacl-dev python3-dev libopus-dev \
-    && /usr/local/bin/python -m pip install --upgrade pip \
-    && pip install -i https://www.piwheels.org/simple/ --extra-index-url https://pypi.org/simple/ --no-cache-dir -r requirements.txt \
-    && apt-get purge -y git \
-    && apt-get autoremove --yes \
-    && rm requirements.txt \
-    && rm -rf /var/lib/apt/lists/*
+# Copy requirements
+COPY --chown=bot:bot ./poetry.lock ./pyproject.toml /bot/
+
+# install project dependecies
+RUN /usr/local/bin/python -m pip install --upgrade pip \
+    && /usr/local/bin/python -m poetry install --no-dev --no-interaction --no-ansi \
+    && rm -rf "$POETRY_CACHE_DIR"
+
+# Copy project
+COPY --chown=bot:bot . /bot
+
+# run as non-root user
+USER bot
 
 # Commands to execute inside container
 CMD ["python", "-O", "-B", "-m", "useless_bot"]

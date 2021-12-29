@@ -32,7 +32,10 @@ class System(commands.Cog):
     @commands.command(hidden=True)
     async def logs(self, ctx: Context):
         """Shutdown the bot"""
-        await ctx.send(file=File("logs/useless_bot.log"))
+        try:
+            await ctx.send(file=File("logs/useless_bot.log"))
+        except ValueError:
+            await ctx.send("Logs not enabled")
 
     @check(is_admin)
     @commands.command()

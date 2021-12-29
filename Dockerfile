@@ -18,7 +18,7 @@ ENV
 
 # System deps
 RUN apt-get update && apt-get -y full-upgrade && \
-    && apt-get install -y git \
+    #&& apt-get install -y git \
     && curl -sSL 'https://install.python-poetry.org' | python - \
     # Cleaning cache:
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \

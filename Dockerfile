@@ -16,11 +16,10 @@ ENV PYTHONFAULTHANDLER=1 \
 
 # System deps
 RUN apt-get update && apt-get -y full-upgrade && \
-    #&& apt-get install -y git \
     && curl -sSL 'https://install.python-poetry.org' | python - \
-    # Cleaning cache:
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
 
 # Change workdir
 WORKDIR /bot

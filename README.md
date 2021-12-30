@@ -1,4 +1,5 @@
 # useless_bot
+[![ci](https://github.com/MRvillager/useless_bot/actions/workflows/ci.yml/badge.svg)](https://github.com/MRvillager/useless_bot/actions/workflows/ci.yml)
 
 A personal bot for Discord using [discord.py](https://github.com/MRvillager/discord.py). \
 This is a self-hosted bot, so you will need to host and maintain your own instance.

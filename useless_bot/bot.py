@@ -25,9 +25,8 @@ class UselessBot(commands.Bot):
             "User-Agent": useragent
         }
         self.loop = asyncio.new_event_loop()
-        task = self.loop.create_task(self.check_loop(), name="CheckLoop")
-        self.loop.run_until_complete(asyncio.wait(task))
-        
+        self.loop.run_until_complete(self.check_loop())
+
         self._conn = aiohttp.TCPConnector(ttl_dns_cache=600, limit=100, loop=self.loop)
         self._session = aiohttp.ClientSession(connector=self._conn, headers=headers, loop=self.loop,
                                               connector_owner=False)

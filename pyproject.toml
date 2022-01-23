@@ -25,7 +25,7 @@ secondary = true
 
 [tool.poetry.dependencies]
 python = "^3.9"
-aiorwlock = "^1.2"
+aiorwlock = "1.2.0"
 aiohttp = { version = "^3", extras = ["speedups"] }
 uvloop = { version = "^0.16", markers = "sys_platform == 'linux'" }
 nextcord = { version = "~2*", allow-prereleases = true}

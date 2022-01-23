@@ -1,9 +1,10 @@
+import asyncio
 import logging
-from asyncio import get_event_loop
+import aiohttp
+
 from os import getenv
 from typing import Any
 
-import aiohttp
 from lavalink import lavalink
 from nextcord import Status, Game, Intents
 from nextcord.ext import commands
@@ -23,7 +24,10 @@ class UselessBot(commands.Bot):
         headers = {
             "User-Agent": useragent
         }
-        self.loop = get_event_loop()
+        self.loop = asyncio.new_event_loop()
+        task = self.loop.create_task(self.check_loop(), name="CheckLoop")
+        self.loop.run_until_complete(asyncio.wait(task))
+        
         self._conn = aiohttp.TCPConnector(ttl_dns_cache=600, limit=100, loop=self.loop)
         self._session = aiohttp.ClientSession(connector=self._conn, headers=headers, loop=self.loop,
                                               connector_owner=False)
@@ -60,6 +64,10 @@ class UselessBot(commands.Bot):
         self.add_cog(system.System(self))
         self.add_cog(music.Music(self))
         self.add_cog(activity.Activity(self))
+
+    @staticmethod
+    async def check_loop():
+        logger.info("Running event loop")
 
     async def on_ready(self):
         """Log the start of bot"""

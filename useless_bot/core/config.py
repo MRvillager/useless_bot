@@ -24,7 +24,7 @@ class Config:
         self._driver.register(self._cog, schema=schema, override_schema=override_schema)
 
         # setup lock
-        self._lock = RWLock()
+        self._lock = RWLock(fast=True)
 
         # transaction variables
         self._in_transaction = False

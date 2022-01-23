@@ -25,7 +25,9 @@ class UselessBot(commands.Bot):
             "User-Agent": useragent
         }
         self.loop = asyncio.new_event_loop()
-        self.loop.run_until_complete(self.check_loop())
+
+        task = self.loop.create_task(self.check_loop(), name="CheckLoop")
+        self.loop.run_until_complete(asyncio.wait([task]))
 
         self._conn = aiohttp.TCPConnector(ttl_dns_cache=600, limit=100, loop=self.loop)
         self._session = aiohttp.ClientSession(connector=self._conn, headers=headers, loop=self.loop,
@@ -67,6 +69,7 @@ class UselessBot(commands.Bot):
     @staticmethod
     async def check_loop():
         logger.info("Running event loop")
+        await asyncio.sleep(3)
 
     async def on_ready(self):
         """Log the start of bot"""
